@@ -9,12 +9,25 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import json
+import logging
+import os
 from pathlib import Path
+
+from django.core.management import execute_from_command_line
+from dotenv import load_dotenv
+
+from django.core.management.commands.runserver import Command as runserver
+from kazoo.client import KazooClient
+
+from kafka import KafkaConsumer
+
+from django.conf import settings
+
+import ssl
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -23,20 +36,93 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-(no=f04hpv1*t1*l+u*q(h%jg$8)k0h8j3lvlw4mc6v6-dj41p'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+load_dotenv()
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
+#
+# ZOOKEEPER = os.environ.get('ZOOKEEPER')
+
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
+#         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+#     }
+# }
+
+caRootLocation = './secrets/CARoot.pem'
+certLocation = './secrets/certificate.pem'
+keyLocation = './secrets/key.pem'
+certKey = './secrets/cert_key.pem'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('DB_NAME'),
+        'CLIENT': {
+            'host': os.environ.get('DB_HOST'),
+            'port': int(os.environ.get('DB_PORT')),
+            'authSource': 'admin',
+            'SSL': True,
+            'tlscertificatekeyfile': certKey,
+            'tlscertificatekeyfilepassword': SSL_PASSWORD,
+            'tlsallowinvalidhostnames': True,
+            'tlsallowinvalidcertificates': True,
+        }
+    }
+}
+
+# logging.basicConfig()
+# logger = logging.getLogger()
+# logger.setLevel(logging.DEBUG)
+
+# # Create a connection to ZooKeeper
+# zk = KazooClient(hosts=ZOOKEEPER,
+#                  use_ssl=True,
+#                  keyfile=keyLocation,
+#                  verify_certs=False,
+#                  certfile=certLocation,
+#                  ca=caRootLocation,
+#                  keyfile_password=SSL_PASSWORD,
+#                  )
+# zk.start()
+#
+# # Create the root node for the CV Processing Service
+# zk.ensure_path('/cv-processing')
+#
+# # Create an ephemeral node for the CV Processing Service
+# service_node = zk.create('/cv-processing/cv-processing-service-', ephemeral=True, sequence=True)
+#
+# # Set the data for the service node to the host and port of the CV Processing Service
+# service_data = {
+#     'host': 'localhost',
+#     'port': runserver.default_port
+# }
+#
+# zk.set(service_node, bytes(json.dumps(service_data), 'utf-8'))
 
 # Application definition
 
 INSTALLED_APPS = [
+    'sslserver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'CV_Processing'
 ]
 
 MIDDLEWARE = [
@@ -70,18 +156,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CV_Processing.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -100,7 +174,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -111,7 +184,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
