@@ -152,3 +152,9 @@ Control.ca-list
 Control.ca-bundle 
 Control.system-ca-bundle 
 GitHub.sublime-settings 
+
+# Security
+secrets/
+
+# Files and etc.
+uploaded_CVs/
