@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "server.ssl",
+      "type": "com.rectruit.authentication.ssl.SslContextInitializer",
+      "sourceType": "com.rectruit.authentication.ssl.SslContextInitializer"
+    }
+  ],
+  "properties": [
+    {
+      "name": "server.ssl.key-store",
+      "type": "java.lang.String",
+      "sourceType": "com.rectruit.authentication.ssl.SslContextInitializer"
+    },
+    {
+      "name": "server.ssl.key-store-password",
+      "type": "java.lang.Character[]",
+      "sourceType": "com.rectruit.authentication.ssl.SslContextInitializer"
+    },
+    {
+      "name": "server.ssl.trust-store",
+      "type": "java.lang.String",
+      "sourceType": "com.rectruit.authentication.ssl.SslContextInitializer"
+    },
+    {
+      "name": "server.ssl.trust-store-password",
+      "type": "java.lang.Character[]",
+      "sourceType": "com.rectruit.authentication.ssl.SslContextInitializer"
+    }
+  ],
+  "hints": []
+}
