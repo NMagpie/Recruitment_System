@@ -39,10 +39,12 @@ public class UserController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(),
+                userDetails,
                 "",
                 userDetails.getAuthorities()
         );
+
+
 
         String jwt = jwtUtils.generateJwtToken(authentication);
 

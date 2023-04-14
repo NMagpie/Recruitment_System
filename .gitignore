@@ -18,6 +18,7 @@ derby.log
 # Maven artifacts
 pom.xml
 /target/
+target/
 
 # Eclipse artifacts, including WTP generated manifests
 bin
@@ -44,6 +45,7 @@ atlassian-ide-plugin.xml
 __pycache__
 db.sqlite3
 media
+__pycache__/
 
 # Backup files # 
 *.bak 
@@ -154,6 +156,7 @@ Control.system-ca-bundle
 GitHub.sublime-settings 
 
 # Security
+**/src/main/resources/static/secrets/
 secrets/
 
 # Files and etc.
