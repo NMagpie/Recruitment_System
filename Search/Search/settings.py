@@ -9,12 +9,24 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+import ssl
+
+from urllib.parse import quote_plus as urlquote
+
+import urllib3
+from urllib3.exceptions import InsecureRequestWarning
+
+urllib3.disable_warnings(InsecureRequestWarning)
+
+urllib3.disable_warnings(UserWarning)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -27,16 +39,48 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+load_dotenv()
+
+caRootLocation = './secrets/CARoot.pem'
+certLocation = './secrets/certificate.pem'
+keyLocation = './secrets/key.pem'
+certKey = './secrets/cert_key.pem'
+
+SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
+
+ELASTIC_HOST = os.environ.get("ELASTIC_HOST")
+
+ELASTIC_PORT = os.environ.get("ELASTIC_PORT")
+
+ELASTIC_USER = os.environ.get("ELASTIC_USER")
+
+ELASTIC_PASSWORD = os.environ.get("ELASTIC_PASSWORD")
+
+elk_base_url = 'https://{user_name}:{password}@{host_ip}:{host_port}'
+elastic_search_url = elk_base_url.format(user_name=ELASTIC_USER,
+                                         password=urlquote(ELASTIC_PASSWORD),
+                                         host_ip=ELASTIC_HOST,
+                                         host_port=ELASTIC_PORT)
+
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': [elastic_search_url],
+        'verify_certs': False,
+    },
+}
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django_elasticsearch_dsl',
+    'sslserver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Search'
 ]
 
 MIDDLEWARE = [
@@ -69,17 +113,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Search.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('DB_NAME'),
+        'CLIENT': {
+            'host': os.environ.get('DB_HOST'),
+            'port': int(os.environ.get('DB_PORT')),
+            'authSource': 'admin',
+            'SSL': True,
+            'tlscertificatekeyfile': certKey,
+            'tlscertificatekeyfilepassword': SSL_PASSWORD,
+            'tlsallowinvalidhostnames': True,
+            'tlsallowinvalidcertificates': True,
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -99,7 +151,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -110,7 +161,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
