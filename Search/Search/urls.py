@@ -14,12 +14,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
 
-from Search.routes import save_cv_metadata, search_cv_metadata
+from Search.cv_routes import save_cv_metadata, search_cv_metadata, delete_cv_metadata
+from Search.job_routes import save_job, search_job, delete_job
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('new_cv/', save_cv_metadata, name='save_cv_metadata'),
-    path('search/', search_cv_metadata, name='search_cv_metadata'),
+
+    path('upload/cv/', save_cv_metadata, name='save_cv_metadata'),
+    path('search/cv/', search_cv_metadata, name='search_cv_metadata'),
+    path('rollback/cv/', delete_cv_metadata, name='delete_cv_metadata'),
+
+    path('upload/job/', save_job, name='save_job'),
+    path('search/job/', search_job, name='search_job'),
+    path('rollback/job/', delete_job, name='delete_job'),
 ]
