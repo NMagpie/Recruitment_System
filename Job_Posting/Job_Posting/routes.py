@@ -14,7 +14,8 @@ def upload_job(request):
             user_id=data['user_id'],
             title=data['title'],
             description=data['description'],
-            location=data['location']
+            location=data['location'],
+            tags=data['tags']
         )
 
         job.save()
