@@ -14,19 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
-from Search.cv_routes import save_cv_metadata, search_cv_metadata, delete_cv_metadata
-from Search.job_routes import save_job, search_job, delete_job
+from Search.common_routes import search_data
+from Search.saga_pattern.saga_routes import get_saga_urls
+from Search.cv_routes import CV_View
+from Search.job_routes import Job_View
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('upload/cv/', save_cv_metadata, name='save_cv_metadata'),
-    path('search/cv/', search_cv_metadata, name='search_cv_metadata'),
-    path('rollback/cv/', delete_cv_metadata, name='delete_cv_metadata'),
+    path('cv/', CV_View.as_view(), name='cv_view'),
 
-    path('upload/job/', save_job, name='save_job'),
-    path('search/job/', search_job, name='search_job'),
-    path('rollback/job/', delete_job, name='delete_job'),
+    path('job/', Job_View.as_view(), name='job_view'),
+
+    path('search/job/', search_data, name='search_job', kwargs={'search_type': 'job'}),
+    path('search/cv/', search_data, name='search_cv_metadata', kwargs={'search_type': 'cv'}),
+
+    path('', include(get_saga_urls()))
 ]

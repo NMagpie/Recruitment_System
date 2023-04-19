@@ -9,8 +9,11 @@ class CVMetadataDocument(Document):
     class Index:
         name = 'cvs'
 
-    tags = fields.TextField(attr="tags_to_list")
+    tags = fields.ListField(fields.TextField())
     db_id = fields.TextField(attr="id_to_str")
+
+    def prepare_tags(self, instance):
+        return instance.tags
 
     @classmethod
     def generate_id(cls, object_instance):
@@ -32,8 +35,11 @@ class JobDocument(Document):
     class Index:
         name = 'jobs'
 
-    tags = fields.TextField(attr="tags_to_list")
+    tags = fields.ListField(fields.TextField())
     db_id = fields.TextField(attr="id_to_str")
+
+    def prepare_tags(self, instance):
+        return instance.tags
 
     @classmethod
     def generate_id(cls, object_instance):

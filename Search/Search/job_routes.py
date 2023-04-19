@@ -2,77 +2,82 @@ import json
 
 from bson import ObjectId
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from elasticsearch_dsl import Q
 
-from .documents import JobDocument
 from .models import Job
+from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 
 
-@csrf_exempt
-def save_job(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
+@method_decorator(csrf_exempt, name='dispatch')
+class Job_View(View):
+    # @csrf_exempt
+    def post(self, request):
+        if request.method == 'POST':
+            try:
+                data = json.loads(request.body)
 
-        job = Job(
-            _id=ObjectId(data.get('_id')),
-            user_id=data.get('user_id'),
-            title=data.get('title'),
-            description=data.get('description'),
-            location=data.get('location'),
-            tags=json.dumps(data.get('tags'))
-        )
+                _id = data.get('_id')
+                user_id = data.get('user_id')
+                title = data.get('title')
+                description = data.get('description')
+                location = data.get('location')
+                tags = data.get('tags')
 
-        job.save()
+                if is_document_locked(_id, 'job'):
+                    return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
-        return JsonResponse({'status': 'success'})
-    return JsonResponse({'status': 'error'})
+                if not _id or \
+                        not user_id or \
+                        not title or \
+                        not description or \
+                        not location or \
+                        not tags:
+                    return JsonResponse({'status': 'error', 'message': 'required fields are missing'}, status=400)
 
+                job = Job(
+                    _id=ObjectId(_id),
+                    user_id=user_id,
+                    title=title,
+                    description=description,
+                    location=location,
+                    tags=tags
+                )
 
-@csrf_exempt
-def search_job(request):
-    if request.method == 'GET':
+                transaction_id = prepare_document(job, 'job')
 
-        tags = request.GET.getlist('q')
+                return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'error', 'message': 'invalid JSON format in request body'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
-        try:
-            offset = int(request.GET.get('offset'))
-        except:
-            return JsonResponse({'status': 'error', 'message': 'offset must be integer'})
+    # @csrf_exempt
+    def delete(self, request):
+        if request.method == 'DELETE':
+            try:
+                job_id = request.GET.get('_id')
 
-        if offset < 0:
-            return JsonResponse({'status': 'error', 'message': 'offset must be greater or equal to 0'})
+                if not job_id:
+                    return JsonResponse({'status': 'error', 'message': 'missing argument: _id'}, status=400)
 
-        if not len(tags):
-            return JsonResponse({'status': 'error', 'message': 'need at least one tag for search'})
+                if is_document_locked(job_id, 'job'):
+                    return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
-        should_clause = [Q('fuzzy', tags={'value': tag, 'fuzziness': 'AUTO'}) for tag in tags] + \
-                        [Q('match_phrase', tags={'query': tag, 'slop': 1}) for tag in tags]
+                document = Job.objects.filter(_id=ObjectId(job_id)).first()
 
-        search_results = JobDocument.search() \
-            .query(Q('bool', should=should_clause)) \
-            .sort('_score') \
-            .extra(size=10, from_=10 * offset)
+                # Delete the data from the database
+                transaction_id = prepare_document(document, 'job', 'delete')
 
-        count = search_results.count(),
-        results = [(result.to_dict()) for result in search_results]
+                # Return a success response
+                return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
-        return JsonResponse({'status': 'success', 'count': count, 'results': results})
-    return JsonResponse({'status': 'error'})
-
-
-@csrf_exempt
-def delete_job(request):
-    if request.method == 'POST':
-        # Get the file hash and filename from the request
-        data = json.loads(request.body)
-
-        job_id = data.get('id')
-
-        # Delete the metadata from the database
-        Job.objects.filter(_id=ObjectId(job_id)).delete()
-
-        # Return a success response
-        return JsonResponse({'status': 'success'}, status=200)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
+            except Job.DoesNotExist:
+                # Handle errors caused by trying to delete a non-existent object
+                return JsonResponse({'error': 'Job data not found'}, status=404)
+            except Exception as e:
+                # Handle all other exceptions
+                print(e)
+                return JsonResponse({'error': 'An error occurred'}, status=500)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
