@@ -41,12 +41,16 @@ ALLOWED_HOSTS = []
 
 load_dotenv()
 
+# SECURITY FILES
+
 caRootLocation = './secrets/CARoot.pem'
 certLocation = './secrets/certificate.pem'
 keyLocation = './secrets/key.pem'
 certKey = './secrets/cert_key.pem'
 
 SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
+
+# ELASTICSEARCH CONFIGURATION
 
 ELASTIC_HOST = os.environ.get("ELASTIC_HOST")
 

@@ -1,7 +1,7 @@
-import json
-
-from django.db import models
+from djongo import models
 from djongo.models import ObjectIdField
+
+from Search.array_field import FieldsArrayField
 
 
 class CVMetadata(models.Model):
@@ -10,16 +10,13 @@ class CVMetadata(models.Model):
     filetype = models.CharField(max_length=100)
     candidate_name = models.CharField(max_length=255)
     user_id = models.CharField(max_length=64)
-    tags = models.JSONField()
+    tags = FieldsArrayField(models.CharField(max_length=255), blank=True)
 
     def __unicode__(self):
         return self._id
 
     def id_to_str(self):
         return str(self._id)
-
-    def tags_to_list(self):
-        return list(json.loads(self.tags))
 
     class Meta:
         db_table = 'cvs'
@@ -31,13 +28,10 @@ class Job(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     location = models.CharField(max_length=255)
-    tags = models.JSONField()
+    tags = FieldsArrayField(models.CharField(max_length=255), blank=True)
 
     def id_to_str(self):
         return str(self._id)
-
-    def tags_to_list(self):
-        return list(json.loads(self.tags))
 
     class Meta:
         db_table = 'jobs'
