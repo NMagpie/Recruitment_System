@@ -45,7 +45,8 @@ def upload_cv(request):
                                 filename=cv_updated_name,
                                 filetype=cv_file.content_type,
                                 candidate_name=candidate_name,
-                                user_id=user_id)
+                                user_id=user_id,
+                                tags=['test', 'test1'])
         metadata.save()
 
         json_metadata = model_to_dict(metadata)
