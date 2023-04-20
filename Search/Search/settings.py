@@ -39,6 +39,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# SAGA CONFIGURATION
+
+app_name = "Search"
+
+# SECURITY CONFIGURATION
+
 load_dotenv()
 
 # SECURITY FILES

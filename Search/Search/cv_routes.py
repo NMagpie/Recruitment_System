@@ -9,10 +9,10 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import CVMetadata
 from Search.saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class CV_View(View):
 
-    #@csrf_exempt
     def post(self, request):
         if request.method == 'POST':
 
@@ -26,7 +26,7 @@ class CV_View(View):
                 user_id = data.get('user_id')
                 tags = data.get('tags')
 
-                if is_document_locked(_id, 'cv_metadata'):
+                if is_document_locked(_id, CVMetadata):
                     return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
                 if not _id or \
@@ -46,7 +46,7 @@ class CV_View(View):
                     tags=tags
                 )
 
-                transaction_id = prepare_document(cv_metadata, 'cv_metadata')
+                transaction_id = prepare_document(cv_metadata)
 
                 return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
@@ -54,7 +54,6 @@ class CV_View(View):
                 return JsonResponse({'status': 'error', 'message': 'invalid JSON format in request body'}, status=400)
         return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
-    #@csrf_exempt
     def delete(self, request):
 
         if request.method == 'DELETE':
@@ -64,13 +63,13 @@ class CV_View(View):
                 if not cv_id:
                     return JsonResponse({'status': 'error', 'message': 'missing argument: _id'}, status=400)
 
-                if is_document_locked(cv_id, 'cv_metadata'):
+                if is_document_locked(cv_id, CVMetadata):
                     return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
                 document = CVMetadata.objects.filter(_id=ObjectId(cv_id)).first()
 
                 # Delete the metadata from the database
-                transaction_id = prepare_document(document, 'cv_metadata', 'delete')
+                transaction_id = prepare_document(document, 'delete')
 
                 # Return a success response
                 return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)

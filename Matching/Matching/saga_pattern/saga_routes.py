@@ -2,8 +2,8 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from Search.saga_pattern.TransactionLogModel import TransactionLog
-from Search.saga_pattern.saga_pattern_util import saga_fail, saga_success
+from Matching.saga_pattern.TransactionLogModel import TransactionLog
+from Matching.saga_pattern.saga_pattern_util import saga_fail, saga_success
 
 from django.urls import path
 

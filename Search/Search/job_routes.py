@@ -25,7 +25,7 @@ class Job_View(View):
                 location = data.get('location')
                 tags = data.get('tags')
 
-                if is_document_locked(_id, 'job'):
+                if is_document_locked(_id, Job):
                     return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
                 if not _id or \
@@ -45,7 +45,7 @@ class Job_View(View):
                     tags=tags
                 )
 
-                transaction_id = prepare_document(job, 'job')
+                transaction_id = prepare_document(job)
 
                 return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
             except json.JSONDecodeError:
@@ -61,13 +61,13 @@ class Job_View(View):
                 if not job_id:
                     return JsonResponse({'status': 'error', 'message': 'missing argument: _id'}, status=400)
 
-                if is_document_locked(job_id, 'job'):
+                if is_document_locked(job_id, Job):
                     return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
                 document = Job.objects.filter(_id=ObjectId(job_id)).first()
 
                 # Delete the data from the database
-                transaction_id = prepare_document(document, 'job', 'delete')
+                transaction_id = prepare_document(document, 'delete')
 
                 # Return a success response
                 return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
