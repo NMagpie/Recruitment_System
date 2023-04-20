@@ -32,6 +32,12 @@ ALLOWED_HOSTS = []
 
 load_dotenv()
 
+# SAGA CONFIGURATION
+
+app_name = "Job_Posting"
+
+# SECURITY CONFIGURATION
+
 SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
 
 caRootLocation = './secrets/CARoot.pem'
