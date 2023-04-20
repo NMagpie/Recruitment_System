@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,10 +29,28 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# SAGA CONFIGURATION
+
+app_name = "Search"
+
+# SECURITY CONFIGURATION
+
+load_dotenv()
+
+# SECURITY FILES
+
+caRootLocation = './secrets/CARoot.pem'
+certLocation = './secrets/certificate.pem'
+keyLocation = './secrets/key.pem'
+certKey = './secrets/cert_key.pem'
+
+SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
+
 
 # Application definition
 
 INSTALLED_APPS = [
+    'sslserver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,8 +96,18 @@ WSGI_APPLICATION = 'Matching.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': os.environ.get('DB_NAME'),
+        'CLIENT': {
+            'host': os.environ.get('DB_HOST'),
+            'port': int(os.environ.get('DB_PORT')),
+            'authSource': 'admin',
+            'SSL': True,
+            'tlscertificatekeyfile': certKey,
+            'tlscertificatekeyfilepassword': SSL_PASSWORD,
+            'tlsallowinvalidhostnames': True,
+            'tlsallowinvalidcertificates': True,
+        }
     }
 }
 
