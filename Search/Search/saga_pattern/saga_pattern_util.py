@@ -4,21 +4,22 @@ from django.db import transaction
 from bson import ObjectId
 from django.forms import model_to_dict
 
-from Search.saga_pattern.TransactionLogModel import TransactionLog, type_model
+from Search.saga_pattern.TransactionLogModel import TransactionLog
+from django.apps import apps
 
 
 def is_document_locked(document_id, document_type):
     try:
-        if TransactionLog.objects.get(document_id=document_id, document_type=document_type):
+        if TransactionLog.objects.get(document_id=document_id, document_type=document_type.__name__):
             return True
     except TransactionLog.DoesNotExist:
         return False
 
 
 @transaction.atomic()
-def prepare_document(document, document_type, action=None):
+def prepare_document(document, action=None):
     if not action:
-        document_model = type_model[document_type]
+        document_model = type(document)
 
         try:
             if document_model.objects.get(_id=document._id):
@@ -28,13 +29,15 @@ def prepare_document(document, document_type, action=None):
 
     previous_state = {}
     if action != 'create':
-        document_model = type_model[document_type]
+        document_model = type(document)
         try:
             previous_document = document_model.objects.get(_id=document._id)
             previous_state = model_to_dict(previous_document)
             previous_state.pop('_id')
         except document_model.DoesNotExist:
             pass
+
+    document_id = document._id
 
     if action == 'delete':
         document.delete()
@@ -44,8 +47,8 @@ def prepare_document(document, document_type, action=None):
         document.save()
 
     transaction = TransactionLog(
-        document_type=document_type,
-        document_id=document._id,
+        document_type=document_model.__name__,
+        document_id=document_id,
         action=action,
         previous_state=previous_state
     )
@@ -56,13 +59,13 @@ def prepare_document(document, document_type, action=None):
 
 
 def saga_success(transaction_id):
-    TransactionLog.objects.filter(_id=ObjectId(transaction_id)).delete()
+    TransactionLog.objects.get(_id=ObjectId(transaction_id)).delete()
 
 
 def saga_fail(transaction_id):
-    transaction = TransactionLog.objects.filter(_id=ObjectId(transaction_id)).first()
+    transaction = TransactionLog.objects.get(_id=ObjectId(transaction_id))
 
-    document_model = type_model[transaction.document_type]
+    document_model = apps.get_model('Search', transaction.document_type)
 
     if transaction.action == 'create':
         document_model \
@@ -81,9 +84,9 @@ def saga_fail(transaction_id):
 
     elif transaction.action == 'delete':
 
-        previous_state = json.loads(transaction.previous_state)
+        previous_state_dict = dict(transaction.previous_state)
 
-        document = document_model(**previous_state)
+        document = document_model(**previous_state_dict)
 
         document._id = ObjectId(transaction.document_id)
 

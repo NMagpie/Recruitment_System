@@ -2,7 +2,7 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from Search.models import CVMetadata
+from Search.saga_pattern.TransactionLogModel import TransactionLog
 from Search.saga_pattern.saga_pattern_util import saga_fail, saga_success
 
 from django.urls import path
@@ -34,9 +34,9 @@ def rollback_saga(request):
         except ValueError:
             # Handle errors caused by invalid JSON data in the request body
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-        except CVMetadata.DoesNotExist:
+        except TransactionLog.DoesNotExist:
             # Handle errors caused by trying to delete a non-existent object
-            return JsonResponse({'error': 'CV data not found'}, status=404)
+            return JsonResponse({'error': 'Transaction data not found'}, status=404)
         except Exception as e:
             # Handle all other exceptions
             print(e)
@@ -63,9 +63,9 @@ def success_saga(request):
         except ValueError:
             # Handle errors caused by invalid JSON data in the request body
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-        except CVMetadata.DoesNotExist:
+        except TransactionLog.DoesNotExist:
             # Handle errors caused by trying to delete a non-existent object
-            return JsonResponse({'error': 'CV data not found'}, status=404)
+            return JsonResponse({'error': 'Transaction data not found'}, status=404)
         except Exception as e:
             # Handle all other exceptions
             print(e)
