@@ -35,36 +35,29 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-(no=f04hpv1*t1*l+u*q(h%jg$8)k0h8j3lvlw4mc6v6-dj41p'
 
+ALLOWED_HOSTS = []
+
 # SECURITY WARNING: don't run with debug turned on in production!
-load_dotenv()
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+load_dotenv()
+
+# SAGA CONFIGURATION
+
+app_name = "CV_Processing"
+
+# SECURITY CONFIGURATION
 
 SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
-#
-# ZOOKEEPER = os.environ.get('ZOOKEEPER')
-
-# Database
-# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.environ.get('DB_NAME'),
-#         'USER': os.environ.get('DB_USER'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD'),
-#         'HOST': os.environ.get('DB_HOST'),
-#         'PORT': os.environ.get('DB_PORT'),
-#         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
-#     }
-# }
 
 caRootLocation = './secrets/CARoot.pem'
 certLocation = './secrets/certificate.pem'
 keyLocation = './secrets/key.pem'
 certKey = './secrets/cert_key.pem'
+
+# Database
+# https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
     'default': {

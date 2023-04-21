@@ -1,9 +1,10 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Job
 import json
 from bson import ObjectId
+
+from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 
 
 @csrf_exempt
@@ -14,15 +15,17 @@ def upload_job(request):
             user_id=data['user_id'],
             title=data['title'],
             description=data['description'],
-            location=data['location'],
-            tags=data['tags']
+            location=data['location']
         )
 
-        job.save()
+        if is_document_locked(str(job._id), Job):
+            return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
-        return JsonResponse({'status': 'success', '_id': str(job._id)}, status=200)
+        transaction_id = prepare_document(job, 'create')
+
+        return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
 
 @csrf_exempt
@@ -44,14 +47,25 @@ def rud_job(request, id):
 
     elif request.method == 'PUT':
         data = json.loads(request.body)
+
+        if is_document_locked(str(job._id), Job):
+            return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
+
         job.title = data['title']
         job.description = data['description']
         job.location = data['location']
-        job.save()
-        return JsonResponse({'status': 'success'}, status=200)
+
+        transaction_id = prepare_document(job, 'update')
+
+        return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
     elif request.method == 'DELETE':
-        job.delete()
-        return JsonResponse({'status': 'success'}, status=200)
+
+        if is_document_locked(str(job._id), Job):
+            return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
+
+        transaction_id = prepare_document(job, 'delete')
+
+        return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)

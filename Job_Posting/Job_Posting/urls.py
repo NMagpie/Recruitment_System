@@ -15,11 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from .routes import upload_job, rud_job
+from .saga_pattern.saga_routes import get_saga_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('jobs/', upload_job, name='upload_job'),
-    path('jobs/<str:id>', rud_job, name='rud_job')
+    path('jobs/<str:id>', rud_job, name='rud_job'),
+
+    path('', include(get_saga_urls()))
 ]
