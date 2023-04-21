@@ -1,12 +1,16 @@
 package com.rectruit.authentication.http;
 
-import com.rectruit.authentication.database.User;
-import com.rectruit.authentication.database.UserRepository;
+import com.rectruit.authentication.http.database.User;
+import com.rectruit.authentication.http.database.UserRepository;
 import com.rectruit.authentication.dtos.JwtResponseDTO;
 import com.rectruit.authentication.dtos.LoginDTO;
 import com.rectruit.authentication.jwt.JwtUtils;
+import com.rectruit.authentication.saga_pattern.TransactionLog;
+import com.rectruit.authentication.saga_pattern.TransactionService;
 import com.rectruit.authentication.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.bson.Document;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -36,6 +41,12 @@ public class AuthController {
     @Autowired
     private PasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginDTO loginRequest) {
 
@@ -55,6 +66,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody User user) {
+
+        if (user.getRoles().contains("ADMIN"))
+            return ResponseEntity.badRequest()
+                    .body("Error: cannot create such user.");
+
         if (userRepository.existsByUsername(user.getUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -63,9 +79,21 @@ public class AuthController {
 
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
-        userRepository.save(user);
+        MappingMongoConverter converter = (MappingMongoConverter) mongoTemplate.getConverter();
 
-        return ResponseEntity.ok("User registered successfully!");
+        Document document = new Document();
+
+        converter.write(user, document);
+
+        TransactionLog transactionLog = transactionService.prepare_document(document, TransactionLog.Action.CREATE, "users");
+
+        String transaction_id = transactionLog.get_id().toString();
+
+        String document_id = transactionLog.getDocumentId();
+
+        return ResponseEntity.ok("{\n\"status\": \"success\"," +
+                "\n\"transaction_id\": \""+ transaction_id +"\"," +
+                "\n\"user_id\": \""+ document_id +"\"\n}");
     }
 
     @GetMapping("/login")

@@ -1,7 +1,7 @@
 package com.rectruit.authentication.http;
 
-import com.rectruit.authentication.database.User;
-import com.rectruit.authentication.database.UserRepository;
+import com.rectruit.authentication.http.database.User;
+import com.rectruit.authentication.http.database.UserRepository;
 import com.rectruit.authentication.dtos.JwtResponseDTO;
 import com.rectruit.authentication.jwt.JwtUtils;
 import com.rectruit.authentication.service.UserDetailsServiceImpl;
@@ -9,7 +9,6 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,6 +60,7 @@ public class UserController {
     @RolesAllowed({"ADMIN", "USER"})
     public ResponseEntity<?> getUser(@PathVariable("id") String id) {
         Optional<User> optionalUser = userRepository.findById(id);
+
         if (optionalUser.isPresent()) {
             optionalUser.get().setPassword("");
             return ResponseEntity.ok(optionalUser.get());
