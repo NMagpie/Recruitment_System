@@ -48,7 +48,8 @@ def upload_cv(request):
                                 filename=cv_updated_name,
                                 filetype=cv_file.content_type,
                                 candidate_name=candidate_name,
-                                user_id=user_id)
+                                user_id=user_id,
+                                tags=['test321', '321test', 'djongo', 'pymongo'])
 
         transaction_id = prepare_document(metadata, 'create')
 
