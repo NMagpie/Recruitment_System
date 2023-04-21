@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Job
 import json
 from bson import ObjectId
+from django.forms import model_to_dict
 
 from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 
@@ -15,7 +16,8 @@ def upload_job(request):
             user_id=data['user_id'],
             title=data['title'],
             description=data['description'],
-            location=data['location']
+            location=data['location'],
+            tags=['test', 'test123', 'django', 'python']
         )
 
         if is_document_locked(str(job._id), Job):
@@ -23,7 +25,11 @@ def upload_job(request):
 
         transaction_id = prepare_document(job, 'create')
 
-        return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
+        json_job = model_to_dict(job)
+
+        json_job['_id'] = str(json_job['_id'])
+
+        return JsonResponse({'status': 'success', 'transaction_id': transaction_id, 'data': json_job}, status=200)
     else:
         return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 

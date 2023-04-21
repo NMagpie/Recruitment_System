@@ -1,5 +1,6 @@
 from django.db import models
 from djongo.models import ObjectIdField
+from Job_Posting.array_field import FieldsArrayField
 
 
 class Job(models.Model):
@@ -8,6 +9,7 @@ class Job(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     location = models.CharField(max_length=255)
+    tags = FieldsArrayField(models.CharField(max_length=255), blank=True)
 
     class Meta:
         db_table = 'uploaded_jobs_info'
