@@ -4,10 +4,10 @@ from django.db import transaction
 from bson import ObjectId
 from django.forms import model_to_dict
 
-from Matching.saga_pattern.TransactionLogModel import TransactionLog
+from Recommendation.saga_pattern.TransactionLogModel import TransactionLog
 from django.apps import apps
 
-from Matching.settings import app_name
+from Recommendation.settings import app_name
 
 
 def is_document_locked(document_id, document_type):
