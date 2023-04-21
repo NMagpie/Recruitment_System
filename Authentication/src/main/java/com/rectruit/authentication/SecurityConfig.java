@@ -55,6 +55,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/saga/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/user/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/user/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/user/**").hasRole("USER")

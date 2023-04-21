@@ -1,7 +1,8 @@
 package com.rectruit.authentication.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.rectruit.authentication.database.User;
+import com.rectruit.authentication.http.database.User;
+import org.bson.types.ObjectId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,7 @@ public class UserDetailsImpl implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String _id;
+    private ObjectId _id;
 
     private String username;
 
@@ -25,7 +26,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String _id, String username, String password,
+    public UserDetailsImpl(ObjectId _id, String username, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this._id = _id;
         this.username = username;
