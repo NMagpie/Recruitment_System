@@ -17,10 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from Recommendation.routes import upload_user, upload_tags, upload_searches, get_recommendations
 from Recommendation.saga_pattern.saga_routes import get_saga_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', include(get_saga_urls()))
+    path('', include(get_saga_urls())),
+
+    path('upload/', upload_user, name='upload_user'),
+    path('tags/', upload_tags, name='upload_tags'),
+    path('searches/', upload_searches, name='upload_searches'),
+    path('recommendation/', get_recommendations, name='get_recommendations'),
 ]
+
+
