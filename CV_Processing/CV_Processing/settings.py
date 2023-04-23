@@ -149,6 +149,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CV_Processing.wsgi.application'
 
+# Authorization
+
+SERVICE_NAME = 'cv_processing'
+
+REGISTER_URL = 'https://localhost:8001/auth/register'
+
+REFRESH_URL = 'https://localhost:8001/auth/refresh'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+        'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# Initial Service Authentication
+SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')
+
+# Validation
+SERVICE_AUTH_SECRET_KEY = os.environ.get('SERVICE_AUTH_SECRET_KEY')
+
+USER_AUTH_SECRET_KEY = os.environ.get('USER_AUTH_SECRET_KEY')
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

@@ -15,7 +15,7 @@ public class SecurityConfig {
     protected SecurityWebFilterChain filterChain(ServerHttpSecurity http) {
         http
                 .cors().and()
-                .csrf().and()
+                .csrf().disable()
                 .httpBasic().and()
                 .logout().disable();
 

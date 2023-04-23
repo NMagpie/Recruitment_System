@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Recommendation'
 ]
 
 MIDDLEWARE = [
@@ -90,6 +91,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Recommendation.wsgi.application'
 
+# Authorization
+
+SERVICE_NAME = 'recommendation'
+
+REGISTER_URL = 'https://localhost:8001/auth/register'
+
+REFRESH_URL = 'https://localhost:8001/auth/refresh'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+        'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# Initial Service Authentication
+SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')
+
+# Validation
+SERVICE_AUTH_SECRET_KEY = os.environ.get('SERVICE_AUTH_SECRET_KEY')
+
+USER_AUTH_SECRET_KEY = os.environ.get('USER_AUTH_SECRET_KEY')
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

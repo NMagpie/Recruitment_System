@@ -14,11 +14,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import threading
+
+import schedule
 from django.contrib import admin
 from django.urls import path, include
 
 from Recommendation.routes import upload_user, upload_tags, upload_searches, get_recommendations
 from Recommendation.saga_pattern.saga_routes import get_saga_urls
+from Recommendation.serviceJWTAuthentication import initialize_token, schedule_loop, refresh_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +35,9 @@ urlpatterns = [
     path('recommendation/', get_recommendations, name='get_recommendations'),
 ]
 
+initialize_token()
 
+schedule_thread = threading.Thread(target=schedule_loop)
+schedule_thread.start()
+
+schedule.every(14).minutes.do(refresh_token)

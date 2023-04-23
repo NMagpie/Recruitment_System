@@ -13,6 +13,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import threading
+
+import schedule as schedule
 from django.contrib import admin
 from django.urls import path, include
 
@@ -20,6 +23,7 @@ from Search.common_routes import search_data
 from Search.saga_pattern.saga_routes import get_saga_urls
 from Search.cv_routes import CV_View
 from Search.job_routes import Job_View
+from Search.serviceJWTAuthentication import initialize_token, schedule_loop, refresh_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,3 +37,10 @@ urlpatterns = [
 
     path('', include(get_saga_urls()))
 ]
+
+initialize_token()
+
+schedule_thread = threading.Thread(target=schedule_loop)
+schedule_thread.start()
+
+schedule.every(14).minutes.do(refresh_token)

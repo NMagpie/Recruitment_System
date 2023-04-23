@@ -14,10 +14,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RequestMapping("/auth")
 // Define a controller for the Orchestrator service
@@ -25,19 +22,35 @@ import java.util.UUID;
 public class OrchestratorController {
 
 
-    @Value("#{${service-keys}}")
-    private final Map<String, String> serviceKeys = new HashMap<>();
+    //@Value("#{${service-keys}}")
+    //private final Map<String, String> serviceKeys = new HashMap<>();
+
+    private ArrayList<String> serviceTypes = new ArrayList<>(List.of(
+            "gateway_api",
+            "authentication",
+            "cv_processing",
+            "job_posting",
+            "search",
+            "recommendation"
+    ));
+
     private final Map<String, Service> services = new HashMap<>();
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${service-secret-key}")
+    private String sharedSecret;
+
+    @Value("${service-jwt-key}")
+    private String jwtSecret;
+
     @PostMapping("/register")
-    public String register(@RequestBody Map<String, String> authData) throws JSONException {
+    public ResponseEntity<String> register(@RequestBody Map<String, String> authData) throws JSONException {
         String serviceName = authData.get("serviceName");
         String sharedSecretKey = authData.get("sharedSecretKey");
 
         // Verify the authentication data
-        if (!serviceKeys.containsKey(serviceName) || !serviceKeys.get(serviceName).equals(sharedSecretKey)) {
+        if (!serviceTypes.contains(serviceName) || !sharedSecret.equals(sharedSecretKey)) {
             throw new UnauthorizedException("Invalid authentication data");
         }
 
@@ -48,7 +61,7 @@ public class OrchestratorController {
                 .setSubject(serviceName)
                 .setId(serviceUUID)
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000)) // 15 minutes
-                .signWith(SignatureAlgorithm.HS256, sharedSecretKey.getBytes())
+                .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes())
                 .compact();
 
         Service service = new Service();
@@ -64,19 +77,19 @@ public class OrchestratorController {
 
         JSONObject response = new JSONObject();
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(serviceName, null, null);
-        Mono.just(token).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+        //Authentication auth = new UsernamePasswordAuthenticationToken(serviceName, null, null);
+        //Mono.just(token).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 
         response.put("token", token);
 
-        response.put("service_uuid", serviceUUID);
+        response.put("serviceUUID", serviceUUID);
 
-        return response.toString();
+        return ResponseEntity.ok(response.toString());
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<String> refresh(@RequestBody Map<String, String> serviceData,
-                                          @RequestHeader(value = "Service-Auth") String authorizationHeader) {
+                                          @RequestHeader(value = "Service-Auth") String authorizationHeader) throws JSONException {
         String serviceName = serviceData.get("serviceName");
         String serviceUUID = serviceData.get("serviceUUID");
 
@@ -89,20 +102,22 @@ public class OrchestratorController {
             throw new UnauthorizedException("Invalid or expired JWT token");
         }
 
-        // Generate a new JWT token and store it in the map
-        String actualSecretKey = serviceKeys.get(serviceName);
         String newToken = Jwts.builder()
                 .setSubject(serviceName)
                 .setExpiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000)) // 15 minutes
-                .signWith(SignatureAlgorithm.HS256, actualSecretKey.getBytes())
+                .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes())
                 .compact();
 
         service.setToken(newToken);
 
         services.put(serviceUUID, service);
 
+        JSONObject response = new JSONObject();
+
+        response.put("token", newToken);
+
         // Return the new token to the service
-        return ResponseEntity.ok(newToken);
+        return ResponseEntity.ok(response.toString());
     }
 
     // Exception handler for unauthorized requests

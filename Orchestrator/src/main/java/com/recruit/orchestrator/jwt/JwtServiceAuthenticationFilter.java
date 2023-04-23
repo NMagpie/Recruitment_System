@@ -19,11 +19,15 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
 public class JwtServiceAuthenticationFilter implements WebFilter {
 
     private final ServerWebExchangeMatcher matcher;
-    @Value("${jwt.secret}")
+
+    @Value("${service-jwt-key}")
     private String jwtSecret;
 
     public JwtServiceAuthenticationFilter() {

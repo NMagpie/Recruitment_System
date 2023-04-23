@@ -3,11 +3,17 @@ import json
 from bson import ObjectId
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
+from Recommendation.serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 from Recommendation.models import UserData
 from Recommendation.saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 
 
+@api_view(['GET'])
+#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
+#@permission_classes([IsAuthenticated])
 @csrf_exempt
 def get_recommendations(request):
     if request.method == 'GET':
@@ -34,6 +40,10 @@ def get_recommendations(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
+
+@api_view(['POST'])
+#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
+#@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_user(request):
     if request.method == 'POST':
@@ -52,7 +62,7 @@ def upload_user(request):
                     not location:
                 return JsonResponse({'status': 'error', 'message': 'required fields are missing'}, status=400)
 
-            userData = UserData.objects.filter(_id=id).first()
+            userData = UserData.objects.filter(_id=ObjectId(id)).first()
 
             if userData:
                 tags = userData.tags
@@ -78,6 +88,9 @@ def upload_user(request):
     return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
 
+@api_view(['POST'])
+#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
+#@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_tags(request):
     if request.method == 'POST':
@@ -88,7 +101,7 @@ def upload_tags(request):
 
             tags = data.get('tags')
 
-            userData = UserData.objects.get(_id=id)
+            userData = UserData.objects.get(_id=ObjectId(id))
 
             if is_document_locked(id, UserData):
                 return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
@@ -118,6 +131,10 @@ def upload_tags(request):
             return JsonResponse({'error': 'An error occurred'}, status=500)
     return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
+
+@api_view(['POST'])
+#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
+#@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_searches(request):
     if request.method == 'POST':
@@ -128,7 +145,7 @@ def upload_searches(request):
 
             searches = data.get('searches')
 
-            userData = UserData.objects.get(_id=id)
+            userData = UserData.objects.get(_id=ObjectId(id))
 
             if is_document_locked(id, UserData):
                 return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
