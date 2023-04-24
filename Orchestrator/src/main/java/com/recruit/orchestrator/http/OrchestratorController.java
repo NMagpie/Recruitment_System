@@ -104,7 +104,7 @@ public class OrchestratorController {
 
         String newToken = Jwts.builder()
                 .setSubject(serviceName)
-                .setExpiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000)) // 15 minutes
+                .setExpiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes())
                 .compact();
 
