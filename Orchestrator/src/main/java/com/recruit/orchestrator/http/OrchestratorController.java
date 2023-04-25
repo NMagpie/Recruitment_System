@@ -3,17 +3,16 @@ package com.recruit.orchestrator.http;
 import com.recruit.orchestrator.services.Service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.*;
 
 @RequestMapping("/auth")
@@ -45,9 +44,18 @@ public class OrchestratorController {
     private String jwtSecret;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody Map<String, String> authData) throws JSONException {
+    public ResponseEntity<String> register(ServerHttpRequest request, @RequestBody Map<String, String> authData) throws JSONException, UnknownHostException {
+
+        String host = request.getHeaders().getHost().getHostName();
+        if (host == null || host.isEmpty() || host.equals("unknown")) {
+            host = InetAddress.getLocalHost().getHostAddress();
+        }
+
+        System.out.println(host);
+
         String serviceName = authData.get("serviceName");
         String sharedSecretKey = authData.get("sharedSecretKey");
+        String port = authData.get("port");
 
         // Verify the authentication data
         if (!serviceTypes.contains(serviceName) || !sharedSecret.equals(sharedSecretKey)) {
@@ -69,16 +77,13 @@ public class OrchestratorController {
         service.setServiceName(serviceName);
         service.setUUID(serviceUUID);
         service.setToken(token);
-        service.setUrl("");
+        service.setUrl("https://"+host+":"+port);
         service.setStatus("OK");
         service.setLoad(0);
 
         services.put(serviceUUID, service);
 
         JSONObject response = new JSONObject();
-
-        //Authentication auth = new UsernamePasswordAuthenticationToken(serviceName, null, null);
-        //Mono.just(token).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
 
         response.put("token", token);
 

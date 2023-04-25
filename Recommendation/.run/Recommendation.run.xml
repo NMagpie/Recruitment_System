@@ -1,0 +1,27 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Recommendation" type="Python.DjangoServer" factoryName="Django server">
+    <module name="Recommendation" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="DJANGO_SETTINGS_MODULE" value="Recommendation.settings" />
+    </envs>
+    <option name="SDK_HOME" value="D:\things\UTM\Diploma\Project_Me\Recommendation\venv\Scripts\python.exe" />
+    <option name="SDK_NAME" value="Python 3.10 (Recommendation)" />
+    <option name="WORKING_DIRECTORY" value="" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <option name="launchJavascriptDebuger" value="false" />
+    <option name="port" value="8006" />
+    <option name="host" value="" />
+    <option name="additionalOptions" value="--certificate ./secrets/certificate.pem --key ./secrets/key.pem" />
+    <option name="browserUrl" value="" />
+    <option name="runTestServer" value="false" />
+    <option name="runNoReload" value="false" />
+    <option name="useCustomRunCommand" value="true" />
+    <option name="customRunCommand" value="runsslserver" />
+    <method v="2" />
+  </configuration>
+</component>

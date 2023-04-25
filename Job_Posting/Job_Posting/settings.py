@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import ssl
 from pathlib import Path
 
 
@@ -93,9 +94,13 @@ WSGI_APPLICATION = 'Job_Posting.wsgi.application'
 
 SERVICE_NAME = 'job_posting'
 
-REGISTER_URL = 'https://localhost:8001/auth/register'
+REGISTER_URL = os.environ.get("REGISTER_URL")
 
-REFRESH_URL = 'https://localhost:8001/auth/refresh'
+REFRESH_URL = os.environ.get("REFRESH_URL")
+
+APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
+
+APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

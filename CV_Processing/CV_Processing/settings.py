@@ -18,9 +18,9 @@ from django.core.management import execute_from_command_line
 from dotenv import load_dotenv
 
 from django.core.management.commands.runserver import Command as runserver
-from kazoo.client import KazooClient
-
-from kafka import KafkaConsumer
+# from kazoo.client import KazooClient
+#
+# from kafka import KafkaConsumer
 
 from django.conf import settings
 
@@ -153,9 +153,13 @@ WSGI_APPLICATION = 'CV_Processing.wsgi.application'
 
 SERVICE_NAME = 'cv_processing'
 
-REGISTER_URL = 'https://localhost:8001/auth/register'
+REGISTER_URL = os.environ.get("REGISTER_URL")
 
-REFRESH_URL = 'https://localhost:8001/auth/refresh'
+REFRESH_URL = os.environ.get("REFRESH_URL")
+
+APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
+
+APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

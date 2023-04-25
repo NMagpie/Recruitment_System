@@ -1,7 +1,7 @@
 package com.rectruit.authentication.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.rectruit.authentication.http.database.User;
+import com.rectruit.authentication.database.User;
 import org.bson.types.ObjectId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

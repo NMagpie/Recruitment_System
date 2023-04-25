@@ -15,7 +15,7 @@ Including another URLconf
 """
 import threading
 
-import schedule as schedule
+import schedule
 from django.contrib import admin
 from django.urls import path, include
 

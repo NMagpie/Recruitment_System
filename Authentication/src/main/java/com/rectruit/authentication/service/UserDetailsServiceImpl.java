@@ -1,7 +1,7 @@
 package com.rectruit.authentication.service;
 
-import com.rectruit.authentication.http.database.User;
-import com.rectruit.authentication.http.database.UserRepository;
+import com.rectruit.authentication.database.User;
+import com.rectruit.authentication.database.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

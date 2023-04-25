@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+  authentication:
+    restart: always
+    build: ./Authentication
+
+    ports:
+      - "8002:8002"
+
+    environment:
+      DB_HOST: host.docker.internal
+
+  cv-processing:
+    restart: always
+    build: ./CV_Processing
+
+    ports:
+      - "8003:8003"
+
+    environment:
+      DB_HOST: host.docker.internal
+
+      REGISTER_URL: https://host.docker.internal:8001/auth/register
+      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
+
+  job-posting:
+    restart: always
+    build: ./Job_Posting
+
+    ports:
+      - "8004:8004"
+
+    environment:
+      DB_HOST: host.docker.internal
+
+      REGISTER_URL: https://host.docker.internal:8001/auth/register
+      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
+
+  search:
+    restart: always
+    build: ./Search
+
+    ports:
+      - "8005:8005"
+
+    environment:
+      DB_HOST: host.docker.internal
+
+      REGISTER_URL: https://host.docker.internal:8001/auth/register
+      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
+
+      ELASTIC_HOST: host.docker.internal
+
+  recommendation:
+    restart: always
+    build: ./Recommendation
+
+    ports:
+      - "8006:8006"
+
+    environment:
+      DB_HOST: host.docker.internal
+
+      REGISTER_URL: https://host.docker.internal:8001/auth/register
+      REFRESH_URL: https://host.docker.internal:8001/auth/refresh

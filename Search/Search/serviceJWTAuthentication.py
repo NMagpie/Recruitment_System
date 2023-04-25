@@ -1,12 +1,14 @@
 import time
 
 import requests
-import schedule
+import schedule as schedule
+from requests.adapters import HTTPAdapter
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.authentication import get_authorization_header
+from urllib3 import PoolManager
 
 from Search.settings import SHARED_SECRET_KEY, USER_AUTH_SECRET_KEY, SERVICE_AUTH_SECRET_KEY, SERVICE_NAME, REFRESH_URL, \
-    REGISTER_URL
+    REGISTER_URL, APP_PORT_VAR
 
 
 class AuthorizationJWTAuthentication(JWTAuthentication):
@@ -35,6 +37,14 @@ data = {
 token = None
 
 
+class HostNameIgnoringAdapter(HTTPAdapter):
+    def init_poolmanager(self, connections, maxsize, block=False, **pool_kwargs):
+        self.poolmanager = PoolManager(num_pools=connections,
+                                       maxsize=maxsize,
+                                       block=block,
+                                       assert_hostname=False, **pool_kwargs)
+
+
 def initialize_token():
     global register_url
 
@@ -42,12 +52,18 @@ def initialize_token():
 
     global token
 
+    s = requests.Session()
+    s.mount('https://', HostNameIgnoringAdapter())
+
     initial_data = {
         'serviceName': data['serviceName'],
-        'sharedSecretKey': SHARED_SECRET_KEY
+        'sharedSecretKey': SHARED_SECRET_KEY,
+        'port': APP_PORT_VAR
     }
 
-    response = requests.post(register_url, json=initial_data, verify='./secrets/ca-cert').json()
+    response = s.post(register_url, json=initial_data, verify='./secrets/ca-cert').json()
+
+    s.close()
 
     data['serviceUUID'] = response['serviceUUID']
 
@@ -61,9 +77,14 @@ def refresh_token():
 
     global token
 
+    s = requests.Session()
+    s.mount('https://', HostNameIgnoringAdapter())
+
     headers = {'Service-Auth': token}
 
-    response = requests.post(refresh_url, headers=headers, json=data, verify='./secrets/ca-cert').json()
+    response = s.post(refresh_url, headers=headers, json=data, verify='./secrets/ca-cert').json()
+
+    s.close()
 
     token = response['token']
 

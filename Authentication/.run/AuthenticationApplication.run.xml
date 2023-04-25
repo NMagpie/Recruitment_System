@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AuthenticationApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="SSL_PASSWORD" value="rootroot" />
+      <env name="SHARED_SECRET_KEY" value="TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234" />
+    </envs>
+    <module name="authentication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.rectruit.authentication.AuthenticationApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

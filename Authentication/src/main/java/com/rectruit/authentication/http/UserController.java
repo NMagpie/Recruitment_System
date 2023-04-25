@@ -1,7 +1,7 @@
 package com.rectruit.authentication.http;
 
-import com.rectruit.authentication.http.database.User;
-import com.rectruit.authentication.http.database.UserRepository;
+import com.rectruit.authentication.database.User;
+import com.rectruit.authentication.database.UserRepository;
 import com.rectruit.authentication.dtos.JwtResponseDTO;
 import com.rectruit.authentication.jwt.JwtUtils;
 import com.rectruit.authentication.service.UserDetailsServiceImpl;

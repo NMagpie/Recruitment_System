@@ -2,6 +2,7 @@ package com.rectruit.authentication;
 
 import com.rectruit.authentication.jwt.JwtAuthEntryPoint;
 import com.rectruit.authentication.jwt.JwtAuthenticationFilter;
+import com.rectruit.authentication.jwt.service.JwtServiceAuthenticationFilter;
 import com.rectruit.authentication.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private JwtServiceAuthenticationFilter jwtServiceAuthenticationFilter;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -51,11 +55,11 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
+                .addFilterBefore(jwtServiceAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/saga/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/user/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/user/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/user/**").hasRole("USER")
