@@ -1,66 +1,83 @@
 version: '3.9'
 
 services:
+  eureka:
+    container_name: eureka
+    restart: always
+    build: ./Eureka
+    ports:
+      - "8761:8761"
+
   authentication:
+    container_name: authentication
     restart: always
     build: ./Authentication
-
+    depends_on:
+      - eureka
     ports:
       - "8002:8002"
-
     environment:
       DB_HOST: host.docker.internal
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
 
   cv-processing:
+    container_name: cv-processing
     restart: always
     build: ./CV_Processing
-
+    depends_on:
+      - eureka
     ports:
       - "8003:8003"
-
     environment:
       DB_HOST: host.docker.internal
-
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
       REGISTER_URL: https://host.docker.internal:8001/auth/register
       REFRESH_URL: https://host.docker.internal:8001/auth/refresh
 
   job-posting:
+    container_name: job-posting
     restart: always
     build: ./Job_Posting
-
+    depends_on:
+      - eureka
     ports:
       - "8004:8004"
-
     environment:
       DB_HOST: host.docker.internal
-
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
       REGISTER_URL: https://host.docker.internal:8001/auth/register
       REFRESH_URL: https://host.docker.internal:8001/auth/refresh
 
   search:
+    container_name: search
     restart: always
     build: ./Search
-
+    depends_on:
+      - eureka
     ports:
       - "8005:8005"
-
     environment:
       DB_HOST: host.docker.internal
-
       REGISTER_URL: https://host.docker.internal:8001/auth/register
       REFRESH_URL: https://host.docker.internal:8001/auth/refresh
-
       ELASTIC_HOST: host.docker.internal
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
 
   recommendation:
+    container_name: recommendation
     restart: always
     build: ./Recommendation
-
+    depends_on:
+      - eureka
     ports:
       - "8006:8006"
-
     environment:
       DB_HOST: host.docker.internal
-
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
       REGISTER_URL: https://host.docker.internal:8001/auth/register
       REFRESH_URL: https://host.docker.internal:8001/auth/refresh

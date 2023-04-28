@@ -8,14 +8,14 @@
       <env name="DJANGO_SETTINGS_MODULE" value="Search.settings" />
     </envs>
     <option name="SDK_HOME" value="D:\things\UTM\Diploma\Project_Me\Search\venv\Scripts\python.exe" />
-    <option name="SDK_NAME" value="Python 3.10 (Search)" />
+    <option name="SDK_NAME" value="Python 3.11 (Search)" />
     <option name="WORKING_DIRECTORY" value="" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="launchJavascriptDebuger" value="false" />
     <option name="port" value="8005" />
-    <option name="host" value="" />
+    <option name="host" value="0.0.0.0" />
     <option name="additionalOptions" value="--certificate ./secrets/certificate.pem --key ./secrets/key.pem" />
     <option name="browserUrl" value="" />
     <option name="runTestServer" value="false" />

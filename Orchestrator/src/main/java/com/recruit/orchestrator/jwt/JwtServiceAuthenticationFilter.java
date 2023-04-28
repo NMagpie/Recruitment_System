@@ -31,7 +31,7 @@ public class JwtServiceAuthenticationFilter implements WebFilter {
     private String jwtSecret;
 
     public JwtServiceAuthenticationFilter() {
-        matcher = ServerWebExchangeMatchers.pathMatchers("/auth/**");
+        matcher = ServerWebExchangeMatchers.pathMatchers("/**");
     }
 
     private String parseJwt(ServerHttpRequest request) {

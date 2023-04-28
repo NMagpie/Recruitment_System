@@ -9,6 +9,7 @@ import com.rectruit.authentication.saga_pattern.TransactionLog;
 import com.rectruit.authentication.saga_pattern.TransactionService;
 import com.rectruit.authentication.service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import org.bson.Document;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class AuthController {
 
     @Autowired
+    @Qualifier("jwtAuthManager")
     private AuthenticationManager customAuthenticationManager;
 
     @Autowired
@@ -54,14 +57,22 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+        Optional<User> optionalUser = userRepository.findByUsername(loginRequest.getUsername());
 
-        return ResponseEntity.ok(new JwtResponseDTO(jwt, userDetails.getUsername(), roles));
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            String jwt = jwtUtils.generateJwtToken(user.get_id().toString());
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(new JwtResponseDTO(jwt, user.get_id().toString(), userDetails.getUsername(), roles));
+        }
+        return ResponseEntity.badRequest().body("No such user!");
     }
 
     @PostMapping("/register")
@@ -91,9 +102,12 @@ public class AuthController {
 
         String document_id = transactionLog.getDocumentId();
 
+        String jwt = jwtUtils.generateJwtToken(document_id);
+
         return ResponseEntity.ok("{\n\"status\": \"success\"," +
                 "\n\"transaction_id\": \""+ transaction_id +"\"," +
-                "\n\"user_id\": \""+ document_id +"\"\n}");
+                "\n\"user_id\": \""+ document_id +"\"," +
+                "\n\"token\": \""+ jwt +"\"\n}");
     }
 
     @GetMapping("/login")

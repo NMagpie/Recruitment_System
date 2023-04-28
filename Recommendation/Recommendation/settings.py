@@ -14,6 +14,7 @@ import ssl
 from pathlib import Path
 
 from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,7 @@ SECRET_KEY = 'django-insecure-ubm!o2kt)pw4br=h$3bbynz9l6j7yh8fwb6)x9u(y0u*4bz2m1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # SAGA CONFIGURATION
 
@@ -103,15 +104,19 @@ APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
 
 APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
-        'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-}
+EUREKA_URL_DEFAULT_ZONE = os.environ.get("EUREKA_URL_DEFAULT_ZONE")
+
+EUREKA_URL = os.environ.get("EUREKA_URL")
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+#         'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+# }
 
 # Initial Service Authentication
 SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')

@@ -6,14 +6,22 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from Recommendation.serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 from Recommendation.models import UserData
 from Recommendation.saga_pattern.saga_pattern_util import is_document_locked, prepare_document
+from Recommendation.serviceJWTAuthentication import ServiceAuthJWTAuthentication, AuthorizationJWTAuthentication
 
 
 @api_view(['GET'])
-#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
-#@permission_classes([IsAuthenticated])
+@csrf_exempt
+def health():
+    return JsonResponse({'status': 'UP'}, status=200)
+
+
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def get_recommendations(request):
     if request.method == 'GET':
@@ -42,8 +50,10 @@ def get_recommendations(request):
 
 
 @api_view(['POST'])
-#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
-#@permission_classes([IsAuthenticated])
+@authentication_classes([
+   AuthorizationJWTAuthentication,
+   ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_user(request):
     if request.method == 'POST':
@@ -89,8 +99,10 @@ def upload_user(request):
 
 
 @api_view(['POST'])
-#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
-#@permission_classes([IsAuthenticated])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_tags(request):
     if request.method == 'POST':
@@ -133,8 +145,10 @@ def upload_tags(request):
 
 
 @api_view(['POST'])
-#@authentication_classes([AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication])
-#@permission_classes([IsAuthenticated])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_searches(request):
     if request.method == 'POST':

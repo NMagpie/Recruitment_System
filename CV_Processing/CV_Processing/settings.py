@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-(no=f04hpv1*t1*l+u*q(h%jg$8)k0h8j3lvlw4mc6v6-dj41p'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -161,15 +161,19 @@ APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
 
 APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
-        'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
-}
+EUREKA_URL_DEFAULT_ZONE = os.environ.get("EUREKA_URL_DEFAULT_ZONE")
+
+EUREKA_URL = os.environ.get("EUREKA_URL")
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+#         'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+# }
 
 # Initial Service Authentication
 SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')

@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="EurekaApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="java -Djavax.net.ssl.trustStore" value="classpath:static/secrets/kafka.truststore.jks" />
+      <env name="java -Djavax.net.ssl.trustStorePassword" value="rootroot" />
+      <env name="SHARED_SECRET_KEY" value="TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234" />
+      <env name="SSL_PASSWORD" value="rootroot" />
+    </envs>
+    <module name="eureka" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.rectuier.eureka.EurekaApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

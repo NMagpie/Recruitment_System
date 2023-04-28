@@ -1,15 +1,20 @@
 import hashlib
 import json
 import os
+import socket
 
 from bson import ObjectId
 from django.core.management.commands.runserver import Command as runserver
 from django.forms import model_to_dict
 from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import FileMetadata
 from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
+from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
+from .settings import APP_PORT_VAR
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -19,6 +24,17 @@ class CustomJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
+@api_view(['GET'])
+@csrf_exempt
+def health():
+    return JsonResponse({'status': 'UP'}, status=200)
+
+
+@api_view(['POST'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_cv(request):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -63,6 +79,11 @@ def upload_cv(request):
         return JsonResponse({'error': 'Invalid request method or missing file'}, status=400)
 
 
+@api_view(['DELETE'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def delete_cv(request):
     if request.method == 'DELETE':
@@ -87,6 +108,11 @@ def delete_cv(request):
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def cv_details(request, id):
     try:
@@ -97,16 +123,20 @@ def cv_details(request, id):
             'filetype': cv_file.filetype,
             'candidate_name': cv_file.candidate_name,
             'user_id': cv_file.user_id,
-            'download_link': f'https://{runserver.default_addr}:{runserver.default_port}/cv/download/{str(cv_file._id)}_{cv_file.filename}'
+            'download_link': f'https://{socket.gethostbyname(socket.gethostname())}:{APP_PORT_VAR}/cv/download/{str(cv_file._id)}_{cv_file.filename}'
         }
         return JsonResponse(response, status=200)
     except FileMetadata.DoesNotExist:
         return JsonResponse({'error': 'CV file does not exist'}, status=404)
 
 
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def cv_download(request, filename):
-
     if '/../' in filename:
         return JsonResponse({'error': 'Invalid file path'}, status=400)
 

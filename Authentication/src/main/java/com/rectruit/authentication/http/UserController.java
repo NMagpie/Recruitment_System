@@ -3,11 +3,14 @@ package com.rectruit.authentication.http;
 import com.rectruit.authentication.database.User;
 import com.rectruit.authentication.database.UserRepository;
 import com.rectruit.authentication.dtos.JwtResponseDTO;
+import com.rectruit.authentication.jwt.FilterUtils;
 import com.rectruit.authentication.jwt.JwtUtils;
 import com.rectruit.authentication.service.UserDetailsServiceImpl;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,25 +33,30 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/refresh_token")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        String authToken = jwtUtils.parseJwt(request);
-        String username = jwtUtils.getUsernameFromJwtToken(authToken);
+    //@Value("${service-jwt-key}")
+    //private String jwtServiceSecret;
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+    public UserController(JwtUtils jwtUtils, UserDetailsServiceImpl userDetailsService, UserRepository userRepository, @Value("${service-jwt-key}") String jwtServiceSecret) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
+        FilterUtils.setJwtUtils(jwtUtils);
+        FilterUtils.setUserDetailsService(userDetailsService);
+        FilterUtils.setJwtServiceSecret(jwtServiceSecret);
+    }
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                "",
-                userDetails.getAuthorities()
-        );
+    @GetMapping("/refresh_token")
+    public ResponseEntity<?> refreshToken(@RequestHeader(value = "Authorization") String authorizationHeader) {
+        String authToken = jwtUtils.parseJwt(authorizationHeader);
+        String id = jwtUtils.getIdFromJwtToken(authToken);
 
+        UserDetails userDetails = userDetailsService.loadUserById(id);
 
-
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        String jwt = jwtUtils.generateJwtToken(id);
 
         return ResponseEntity.ok(new JwtResponseDTO(
                 jwt,
+                id,
                 userDetails.getUsername(),
                 userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
@@ -57,13 +65,16 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    @RolesAllowed({"ADMIN", "USER"})
+    //@RolesAllowed({"ADMIN", "USER"})
     public ResponseEntity<?> getUser(@PathVariable("id") String id) {
         Optional<User> optionalUser = userRepository.findById(id);
 
         if (optionalUser.isPresent()) {
-            optionalUser.get().setPassword("");
-            return ResponseEntity.ok(optionalUser.get());
+            User user = optionalUser.get();
+
+            user.set_id(new ObjectId(id));
+
+            return ResponseEntity.ok(user);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -78,11 +89,19 @@ public class UserController {
     }
 
     @PutMapping("/user/{id}")
-    @RolesAllowed("ADMIN")
-    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody User user) {
-        Optional<User> optionalUser = userRepository.findById(id);
+    //@RolesAllowed("ADMIN")
+    public ResponseEntity<?> updateUser(@RequestHeader(value = "Authorization") String authorizationHeader, @PathVariable("id") String id, @RequestBody User user) {
+
+        String authToken = jwtUtils.parseJwt(authorizationHeader);
+        String _id = jwtUtils.getIdFromJwtToken(authToken);
+
+        Optional<User> optionalUser = userRepository.findById(_id);
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
+
+            if (!existingUser.get_id().toString().equals(_id))
+                return ResponseEntity.badRequest().body("Id and credentials do not coincide.");
+
             existingUser.setUsername(user.getUsername());
             existingUser.setPassword(user.getPassword());
             userRepository.save(existingUser);

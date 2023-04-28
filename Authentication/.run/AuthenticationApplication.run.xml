@@ -1,8 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AuthenticationApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
     <envs>
-      <env name="SSL_PASSWORD" value="rootroot" />
+      <env name="java -Djavax.net.ssl.trustStore" value="/static/secrets/kafka.truststore.jks" />
+      <env name="java -Djavax.net.ssl.trustStorePassword" value="rootroot" />
       <env name="SHARED_SECRET_KEY" value="TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234" />
+      <env name="SSL_PASSWORD" value="rootroot" />
     </envs>
     <module name="authentication" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.rectruit.authentication.AuthenticationApplication" />

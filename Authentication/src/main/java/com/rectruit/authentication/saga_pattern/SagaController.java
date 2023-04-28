@@ -8,14 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/saga")
+//@RequestMapping("/saga")
 public class SagaController {
 
     @Autowired
 
     private TransactionService transactionService;
 
-    @PostMapping("/rollback")
+    @PostMapping("/rollback/")
     public ResponseEntity<?> rollbackSaga(@RequestBody String requestBody) {
         try {
             JSONObject data = new JSONObject(requestBody);
@@ -33,7 +33,7 @@ public class SagaController {
         }
     }
 
-    @PostMapping("/success")
+    @PostMapping("/success/")
     public ResponseEntity<?> successSaga(@RequestBody String requestBody) {
         try {
             JSONObject data = new JSONObject(requestBody);

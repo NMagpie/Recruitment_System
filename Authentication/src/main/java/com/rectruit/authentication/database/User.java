@@ -2,6 +2,8 @@ package com.rectruit.authentication.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Getter;
 import lombok.Setter;
 import org.bson.types.ObjectId;
@@ -16,6 +18,7 @@ public class User {
     @Getter
     @Setter
     @MongoId
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId _id;
 
     @Getter

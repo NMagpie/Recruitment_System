@@ -14,7 +14,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <option name="launchJavascriptDebuger" value="false" />
     <option name="port" value="8004" />
-    <option name="host" value="" />
+    <option name="host" value="0.0.0.0" />
     <option name="additionalOptions" value="--certificate ./secrets/certificate.pem --key ./secrets/key.pem" />
     <option name="browserUrl" value="" />
     <option name="runTestServer" value="false" />
