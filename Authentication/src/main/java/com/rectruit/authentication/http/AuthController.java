@@ -111,7 +111,7 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public ResponseEntity<?> logout(@RequestParam(value = "error", required = false) String error,
+    public ResponseEntity<String> logout(@RequestParam(value = "error", required = false) String error,
                                     @RequestParam(value = "logout", required = false) String logout) {
         if (logout != null) {
             return ResponseEntity.ok("Logged out successfully!");

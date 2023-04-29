@@ -38,7 +38,7 @@ class AuthorizationJWTAuthentication(JWTAuthentication):
             body['real_id'] = decoded_token['sub']
 
             request.body = json.dumps(body)
-        except DecodeError:
+        except Exception:
             return None
 
         user = type('test', (), {})()
@@ -68,7 +68,7 @@ class ServiceAuthJWTAuthentication(JWTAuthentication):
         # Validate token using the secret key
         try:
             decoded_token = jwt.decode(token, algorithms=['HS256'], verify=True, key=b64decode(SERVICE_AUTH_SECRET_KEY))
-        except DecodeError:
+        except Exception:
             return None
 
         user = type('test', (), {})()

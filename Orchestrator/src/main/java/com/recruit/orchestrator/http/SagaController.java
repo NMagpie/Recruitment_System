@@ -5,22 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.recruit.orchestrator.SecurityConfig;
 import com.recruit.orchestrator.jwt.JwtUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.HeaderParam;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import reactor.core.publisher.Mono;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -46,9 +43,9 @@ public class SagaController {
 
 
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> register_user(@RequestBody Map<String, Object> user) {
+    public ResponseEntity<String> register_user(@RequestBody Map<String, Object> user) {
 
-        HashMap<ServiceInstance, Transaction> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
 
         try {
 
@@ -67,7 +64,7 @@ public class SagaController {
             HttpEntity<Map<String, Object>> authRequestEntity = new HttpEntity<>(user, authHeaders);
             ResponseEntity<HashMap> authResponseEntity = restTemplate.exchange(authUrl, HttpMethod.POST, authRequestEntity, HashMap.class);
 
-            affectedServices.put(authentication, new Transaction((String) authResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(authentication, (String) authResponseEntity.getBody().get("transaction_id"));
             check_status(authResponseEntity.getBody().get("status"));
 
             String userId = (String) authResponseEntity.getBody().get("user_id");
@@ -88,7 +85,7 @@ public class SagaController {
             HttpEntity<Map<String, String>> recRequestEntity = new HttpEntity<>(recRequestBody, recHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, new Transaction((String) recResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -100,21 +97,26 @@ public class SagaController {
             response.put("jwt", token);
 
 
-            return Mono.just(objectMapper.writeValueAsString(response));
-        } catch (Exception e) {
+            return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorResponse = e.getMessage();
+            HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
-            return Mono.just(e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
+        } catch (Exception e) {
+            String errorResponse = e.getMessage();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping(value = "/upload_cv", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> upload_cv(@RequestHeader(value = "Authorization") String authHeader,
+    public ResponseEntity<String> upload_cv(@RequestHeader(value = "Authorization") String authHeader,
                                   @RequestParam("file") MultipartFile file,
                                   @RequestParam("candidate_name") String candidateName,
                                   @RequestParam("user_id") String userId) {
 
-        HashMap<ServiceInstance, Transaction> affectedServices = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
+        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance cvProcessing = loadBalancer.choose("CV_PROCESSING");
@@ -140,7 +142,7 @@ public class SagaController {
 
             Map<String, Object> cvResponseMap = objectMapper.readValue(cvResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
 
-            affectedServices.put(cvProcessing, new Transaction((String) cvResponseMap.get("transaction_id"), "/cv"));
+            affectedServices.put(cvProcessing, (String) cvResponseMap.get("transaction_id"));
             check_status(cvResponseMap.get("status"));
 
             HashMap<String, Object> data = (HashMap) cvResponseMap.get("data");
@@ -153,7 +155,6 @@ public class SagaController {
             recHeaders.set("Service-Auth", "Bearer " + securityConfig.getToken());
             recHeaders.set("Authorization", authHeader);
 
-            //Map<String, Object> cvDataMap = objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {});
             Map<String, Object> recRequest = new HashMap<>();
             recRequest.put("_id", data.get("user_id"));
             recRequest.put("tags", data.get("tags"));
@@ -161,7 +162,7 @@ public class SagaController {
             HttpEntity<Map<String, Object>> recRequestEntity = new HttpEntity<>(recRequest, recHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, new Transaction((String) recResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
             check_status(recResponseEntity.getBody().get("status"));
 
             // POST REQUEST TO SEARCH
@@ -171,7 +172,7 @@ public class SagaController {
             HttpEntity<HashMap<String, Object>> searchRequestEntity = new HttpEntity<>(data, recHeaders);
             ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.POST, searchRequestEntity, HashMap.class);
 
-            affectedServices.put(search, new Transaction((String) searchResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -179,21 +180,26 @@ public class SagaController {
             HashMap<String, String> response = new HashMap<>();
 
             response.put("status", "CV SUCCESSFULLY UPLOADED!");
-            response.put("cd_id", (String) data.get("_id"));
+            response.put("cv_id", (String) data.get("_id"));
 
-            return Mono.just(objectMapper.writeValueAsString(response));
-        } catch (Exception e) {
+            return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorResponse = e.getMessage();
+            HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
-            return Mono.just(e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
+        } catch (Exception e) {
+            String errorResponse = e.getMessage();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping(value = "/upload_job", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> upload_cv(@RequestHeader(value = "Authorization") String authHeader,
+    public ResponseEntity<String> upload_job(@RequestHeader(value = "Authorization") String authHeader,
                                   @RequestBody Map<String, Object> job) {
 
-        HashMap<ServiceInstance, Transaction> affectedServices = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
+        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance jobPosting = loadBalancer.choose("JOB_POSTING");
@@ -214,7 +220,7 @@ public class SagaController {
 
             Map<String, Object> cvResponseMap = objectMapper.readValue(jobResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
 
-            affectedServices.put(jobPosting, new Transaction((String) cvResponseMap.get("transaction_id")));
+            affectedServices.put(jobPosting, (String) cvResponseMap.get("transaction_id"));
             check_status(cvResponseMap.get("status"));
 
             HashMap<String, Object> data = (HashMap) cvResponseMap.get("data");
@@ -223,7 +229,6 @@ public class SagaController {
 
             String recUrl = recommendation.getUri().toString().replace("http://", "https://") + "/tags/";
 
-            //Map<String, Object> cvDataMap = objectMapper.readValue(data, new TypeReference<Map<String, Object>>() {});
             Map<String, Object> recRequest = new HashMap<>();
             recRequest.put("_id", data.get("user_id"));
             recRequest.put("tags", data.get("tags"));
@@ -231,7 +236,7 @@ public class SagaController {
             HttpEntity<Map<String, Object>> recRequestEntity = new HttpEntity<>(recRequest, authHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, new Transaction((String) recResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
             check_status(recResponseEntity.getBody().get("status"));
 
             // POST REQUEST TO SEARCH
@@ -241,7 +246,7 @@ public class SagaController {
             HttpEntity<HashMap<String, Object>> searchRequestEntity = new HttpEntity<>(data, authHeaders);
             ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.POST, searchRequestEntity, HashMap.class);
 
-            affectedServices.put(search, new Transaction((String) searchResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -251,22 +256,28 @@ public class SagaController {
             response.put("status", "JOB SUCCESSFULLY UPLOADED!");
             response.put("job_id", (String) data.get("_id"));
 
-            return Mono.just(objectMapper.writeValueAsString(response));
-        } catch (Exception e) {
+            return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorResponse = e.getMessage();
+            HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
-            return Mono.just(e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
+        } catch (Exception e) {
+            String errorResponse = e.getMessage();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(value = "/search/{prefix}/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> search(HttpServletRequest request, @RequestHeader(value = "Authorization") String authHeader,
+    public ResponseEntity<String> search(HttpServletRequest request, @RequestHeader(value = "Authorization") String authHeader,
                                @RequestParam("q") List<String> queries,
                                @RequestParam("offset") long offset,
                                @PathVariable("prefix") String prefix) {
         if (!prefix.equals("job") && !prefix.equals("cv"))
-            return Mono.just("Unknown prefix, choose one of those: job, cv");
+            return new ResponseEntity<>("Unknown prefix, choose one of those: job, cv", HttpStatus.BAD_REQUEST);
 
-        HashMap<ServiceInstance, Transaction> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
@@ -303,27 +314,145 @@ public class SagaController {
             HttpEntity<HashMap> recRequestEntity = new HttpEntity<>(recRequestBody, authHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, new Transaction((String) recResponseEntity.getBody().get("transaction_id")));
+            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
-            return Mono.just(searchResponseEntity.getBody());
-        } catch (Exception e) {
+            return new ResponseEntity<>(searchResponseEntity.getBody(), HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorResponse = e.getMessage();
+            HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
-            return Mono.just(e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
+        } catch (Exception e) {
+            String errorResponse = e.getMessage();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void final_changes(HashMap<ServiceInstance, Transaction> affectedServices, Boolean commit) {
+    @DeleteMapping(value = "/delete_cv/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> delete_cv(@RequestHeader(value = "Authorization") String authHeader,
+                                  @PathVariable("id") String id) {
+        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+
+        try {
+            ServiceInstance search = loadBalancer.choose("SEARCH");
+            ServiceInstance cv = loadBalancer.choose("CV_PROCESSING");
+
+            // GET REQUEST TO CV_PROCESSING
+
+            String cvUrl = cv.getUri().toString().replace("http://", "https://") +
+                        "/cv/delete/" + id;
+
+            HttpHeaders authHeaders = new HttpHeaders();
+            authHeaders.setContentType(MediaType.APPLICATION_JSON);
+            authHeaders.set("Service-Auth", "Bearer " + securityConfig.getToken());
+            authHeaders.set("Authorization", authHeader);
+
+            HttpEntity<String> cvRequestEntity = new HttpEntity<>(null, authHeaders);
+            ResponseEntity<HashMap> cvResponseEntity = restTemplate.exchange(cvUrl, HttpMethod.DELETE, cvRequestEntity, HashMap.class);
+
+            affectedServices.put(cv, (String) cvResponseEntity.getBody().get("transaction_id"));
+            check_status(cvResponseEntity.getBody().get("status"));
+
+            // GET REQUEST TO SEARCH
+
+            String searchUrl = search.getUri().toString().replace("http://", "https://") +
+                    "/cv/?_id=" + id;
+
+            HttpEntity<String> searchRequestEntity = new HttpEntity<>(null, authHeaders);
+            ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.DELETE, searchRequestEntity, HashMap.class);
+
+            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
+            check_status(cvResponseEntity.getBody().get("status"));
+
+            final_changes(affectedServices, true);
+
+            HashMap<String, String> response = new HashMap<>();
+
+            response.put("status", "CV SUCCESSFULLY DELETED!");
+            response.put("cv_id", id);
+
+            return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorResponse = e.getMessage();
+            HttpStatusCode status = e.getStatusCode();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
+        } catch (Exception e) {
+            String errorResponse = e.getMessage();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping(value = "/delete_job/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> delete_job(@RequestHeader(value = "Authorization") String authHeader,
+                                  @PathVariable("id") String id) {
+        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+
+        try {
+            ServiceInstance search = loadBalancer.choose("SEARCH");
+            ServiceInstance job = loadBalancer.choose("JOB_POSTING");
+
+            // GET REQUEST TO CV_PROCESSING
+
+            String jobUrl = job.getUri().toString().replace("http://", "https://") +
+                    "/jobs/" + id;
+
+            HttpHeaders authHeaders = new HttpHeaders();
+            authHeaders.setContentType(MediaType.APPLICATION_JSON);
+            authHeaders.set("Service-Auth", "Bearer " + securityConfig.getToken());
+            authHeaders.set("Authorization", authHeader);
+
+            HttpEntity<String> cvRequestEntity = new HttpEntity<>(null, authHeaders);
+            ResponseEntity<HashMap> cvResponseEntity = restTemplate.exchange(jobUrl, HttpMethod.DELETE, cvRequestEntity, HashMap.class);
+
+            affectedServices.put(job, (String) cvResponseEntity.getBody().get("transaction_id"));
+            check_status(cvResponseEntity.getBody().get("status"));
+
+            // GET REQUEST TO SEARCH
+
+            String searchUrl = search.getUri().toString().replace("http://", "https://") +
+                    "/job/?_id=" + id;
+
+            HttpEntity<String> searchRequestEntity = new HttpEntity<>(null, authHeaders);
+            ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.DELETE, searchRequestEntity, HashMap.class);
+
+            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
+            check_status(cvResponseEntity.getBody().get("status"));
+
+            final_changes(affectedServices, true);
+
+            HashMap<String, String> response = new HashMap<>();
+
+            response.put("status", "JOB SUCCESSFULLY DELETED!");
+            response.put("job_id", id);
+
+            return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            String errorResponse = e.getMessage();
+            HttpStatusCode status = e.getStatusCode();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
+        } catch (Exception e) {
+            String errorResponse = e.getMessage();
+            final_changes(affectedServices, false);
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void final_changes(HashMap<ServiceInstance, String> affectedServices, Boolean commit) {
 
         String action = (commit) ? "/success/" : "/rollback/";
 
         affectedServices.forEach( (service, transaction) -> {
             HashMap<String, String> request = new HashMap<>();
-            request.put("id", transaction.getId());
+            request.put("id", transaction);
 
             restTemplate.exchange(
-                    service.getUri().toString().replace("http://", "https://") + transaction.getPrefix() + action,
+                    service.getUri().toString().replace("http://", "https://") + action,
                     HttpMethod.POST,
                     new HttpEntity<>(request, securityConfig.getHeaders()),
                     String.class);

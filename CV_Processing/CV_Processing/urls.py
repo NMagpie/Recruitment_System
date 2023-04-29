@@ -21,7 +21,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from .routes import upload_cv, cv_details, cv_download, delete_cv, health
-from .saga_routes_file_wrapper import get_file_saga_urls
+from .saga_pattern.saga_routes import get_saga_urls
 from .serviceJWTAuthentication import initialize_token, schedule_loop, refresh_token
 import py_eureka_client.eureka_client as eureka_client
 from CV_Processing.settings import SERVICE_NAME, APP_PORT_VAR, EUREKA_URL_DEFAULT_ZONE
@@ -29,12 +29,12 @@ from CV_Processing.settings import SERVICE_NAME, APP_PORT_VAR, EUREKA_URL_DEFAUL
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cv/', upload_cv, name='upload_cv'),
-    path('cv/delete', delete_cv, name='delete_cv'),
+    path('cv/delete/<str:id>', delete_cv, name='delete_cv'),
     path('cv/info/<str:id>', cv_details, name='cv_details'),
-    path('cv/download/<str:filename>', cv_download, name='cv_download'),
+    path('cv/download/<str:id>', cv_download, name='cv_download'),
     path('health', health, name='health'),
 
-    path('', include(get_file_saga_urls()))
+    path('', include(get_saga_urls()))
 ]
 
 # initialize_token()
