@@ -1,4 +1,4 @@
-package com.recruit.orchestrator.http;
+package com.recruit.orchestrator.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

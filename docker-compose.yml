@@ -8,16 +8,45 @@ services:
     ports:
       - "8761:8761"
 
+  mongo:
+    container_name: mongo
+    restart: always
+    image: mongo
+    ports:
+      - "27017:27017"
+
+    command: --config /etc/mongo/mongod.conf #&& mongo /docker-entrypoint-initdb.d/mongo-init.js
+
+    volumes:
+      - ./mongo/mongod.conf:/etc/mongo/mongod.conf
+      - ./CV_Processing/secrets/cert_key.pem:/etc/mongo/cert_key.pem
+      - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - ./mongo/mongodb:/var/lib/mongodb:rw
+
+  orchestrator:
+    container_name: orchestrator
+    restart: always
+    build: ./Orchestrator
+    depends_on:
+      - eureka
+    ports:
+      - "8001:8001"
+    environment:
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
+
   authentication:
     container_name: authentication
     restart: always
     build: ./Authentication
     depends_on:
       - eureka
+      - mongo
     ports:
       - "8002:8002"
     environment:
-      DB_HOST: host.docker.internal
+      DB_HOST: mongo
+      #DB_HOST: host.docker.internal
       EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
       EUREKA_URL: http://eureka:8761
 
@@ -27,14 +56,14 @@ services:
     build: ./CV_Processing
     depends_on:
       - eureka
+      - mongo
     ports:
       - "8003:8003"
     environment:
-      DB_HOST: host.docker.internal
+      DB_HOST: mongo
+      #DB_HOST: host.docker.internal
       EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
       EUREKA_URL: http://eureka:8761
-      REGISTER_URL: https://host.docker.internal:8001/auth/register
-      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
 
   job-posting:
     container_name: job-posting
@@ -42,14 +71,14 @@ services:
     build: ./Job_Posting
     depends_on:
       - eureka
+      - mongo
     ports:
       - "8004:8004"
     environment:
-      DB_HOST: host.docker.internal
+      DB_HOST: mongo
+      #DB_HOST: host.docker.internal
       EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
       EUREKA_URL: http://eureka:8761
-      REGISTER_URL: https://host.docker.internal:8001/auth/register
-      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
 
   search:
     container_name: search
@@ -57,12 +86,12 @@ services:
     build: ./Search
     depends_on:
       - eureka
+      - mongo
     ports:
       - "8005:8005"
     environment:
-      DB_HOST: host.docker.internal
-      REGISTER_URL: https://host.docker.internal:8001/auth/register
-      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
+      DB_HOST: mongo
+      #DB_HOST: host.docker.internal
       ELASTIC_HOST: host.docker.internal
       EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
       EUREKA_URL: http://eureka:8761
@@ -73,11 +102,11 @@ services:
     build: ./Recommendation
     depends_on:
       - eureka
+      - mongo
     ports:
       - "8006:8006"
     environment:
-      DB_HOST: host.docker.internal
+      DB_HOST: mongo
+      #DB_HOST: host.docker.internal
       EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
       EUREKA_URL: http://eureka:8761
-      REGISTER_URL: https://host.docker.internal:8001/auth/register
-      REFRESH_URL: https://host.docker.internal:8001/auth/refresh
