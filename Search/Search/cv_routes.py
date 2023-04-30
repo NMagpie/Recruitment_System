@@ -5,11 +5,18 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import CVMetadata
 from Search.saga_pattern.saga_pattern_util import is_document_locked, prepare_document
+from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 
 
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @method_decorator(csrf_exempt, name='dispatch')
 class CV_View(View):
 

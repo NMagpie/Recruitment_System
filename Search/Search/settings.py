@@ -37,7 +37,7 @@ SECRET_KEY = 'django-insecure-c9zu&3!u5+qz7$#havvl6c*tzm6#@kt#nm-)8bi&u0ft^dbr!=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # SAGA CONFIGURATION
 
@@ -122,6 +122,40 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Search.wsgi.application'
+
+# Authorization
+
+SERVICE_NAME = 'search'
+
+REGISTER_URL = os.environ.get("REGISTER_URL")
+
+REFRESH_URL = os.environ.get("REFRESH_URL")
+
+APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
+
+APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
+
+EUREKA_URL_DEFAULT_ZONE = os.environ.get("EUREKA_URL_DEFAULT_ZONE")
+
+EUREKA_URL = os.environ.get("EUREKA_URL")
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+#         'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+# }
+
+# Initial Service Authentication
+SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')
+
+# Validation
+SERVICE_AUTH_SECRET_KEY = os.environ.get('SERVICE_AUTH_SECRET_KEY')
+
+USER_AUTH_SECRET_KEY = os.environ.get('USER_AUTH_SECRET_KEY')
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases

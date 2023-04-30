@@ -7,10 +7,13 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from CV_Processing.models import FileMetadata
 from CV_Processing.saga_pattern.TransactionLogModel import TransactionLog
 from CV_Processing.saga_pattern.saga_pattern_util import saga_fail, saga_success
+from CV_Processing.serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 
 
 def get_file_saga_urls():
@@ -20,6 +23,11 @@ def get_file_saga_urls():
     ]
 
 
+@api_view(['POST'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def file_rollback_saga(request):
     if request.method == 'POST':
@@ -67,6 +75,11 @@ def file_rollback_saga(request):
         return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
 
+@api_view(['POST'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def file_success_saga(request):
     if request.method == 'POST':

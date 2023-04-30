@@ -18,9 +18,9 @@ from django.core.management import execute_from_command_line
 from dotenv import load_dotenv
 
 from django.core.management.commands.runserver import Command as runserver
-from kazoo.client import KazooClient
-
-from kafka import KafkaConsumer
+# from kazoo.client import KazooClient
+#
+# from kafka import KafkaConsumer
 
 from django.conf import settings
 
@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-(no=f04hpv1*t1*l+u*q(h%jg$8)k0h8j3lvlw4mc6v6-dj41p'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -148,6 +148,40 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'CV_Processing.wsgi.application'
+
+# Authorization
+
+SERVICE_NAME = 'cv_processing'
+
+REGISTER_URL = os.environ.get("REGISTER_URL")
+
+REFRESH_URL = os.environ.get("REFRESH_URL")
+
+APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
+
+APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
+
+EUREKA_URL_DEFAULT_ZONE = os.environ.get("EUREKA_URL_DEFAULT_ZONE")
+
+EUREKA_URL = os.environ.get("EUREKA_URL")
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+#         'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+# }
+
+# Initial Service Authentication
+SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')
+
+# Validation
+SERVICE_AUTH_SECRET_KEY = os.environ.get('SERVICE_AUTH_SECRET_KEY')
+
+USER_AUTH_SECRET_KEY = os.environ.get('USER_AUTH_SECRET_KEY')
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

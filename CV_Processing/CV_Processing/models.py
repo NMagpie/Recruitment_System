@@ -11,6 +11,7 @@ class FileMetadata(models.Model):
     candidate_name = models.CharField(max_length=255)
     user_id = models.CharField(max_length=64)
     tags = FieldsArrayField(models.CharField(max_length=255), blank=True)
+    file = models.BinaryField()
 
     class Meta:
         db_table = 'uploaded_cv_files_info'

@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import ssl
 from pathlib import Path
 
 from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +29,7 @@ SECRET_KEY = 'django-insecure-ubm!o2kt)pw4br=h$3bbynz9l6j7yh8fwb6)x9u(y0u*4bz2m1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # SAGA CONFIGURATION
 
@@ -46,7 +48,6 @@ certKey = './secrets/cert_key.pem'
 
 SSL_PASSWORD = os.environ.get('SSL_PASSWORD')
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -57,6 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Recommendation'
 ]
 
 MIDDLEWARE = [
@@ -90,6 +92,39 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Recommendation.wsgi.application'
 
+# Authorization
+
+SERVICE_NAME = 'recommendation'
+
+REGISTER_URL = os.environ.get("REGISTER_URL")
+
+REFRESH_URL = os.environ.get("REFRESH_URL")
+
+APP_PORT_VAR = os.environ.get("APP_PORT_VAR")
+
+APP_HOST_VAR = os.environ.get("APP_HOST_VAR")
+
+EUREKA_URL_DEFAULT_ZONE = os.environ.get("EUREKA_URL_DEFAULT_ZONE")
+
+EUREKA_URL = os.environ.get("EUREKA_URL")
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         #'Recommendation.serviceJWTAuthentication.AuthorizationJWTAuthentication',
+#         'Recommendation.serviceJWTAuthentication.ServiceAuthJWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+# }
+
+# Initial Service Authentication
+SHARED_SECRET_KEY = os.environ.get('SHARED_SECRET_KEY')
+
+# Validation
+SERVICE_AUTH_SECRET_KEY = os.environ.get('SERVICE_AUTH_SECRET_KEY')
+
+USER_AUTH_SECRET_KEY = os.environ.get('USER_AUTH_SECRET_KEY')
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

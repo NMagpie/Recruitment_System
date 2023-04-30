@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="OrchestratorApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="SSL_PASSWORD" value="rootroot" />
+      <env name="SHARED_SECRET_KEY" value="TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234" />
+    </envs>
+    <module name="orchestrator" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.recruit.orchestrator.OrchestratorApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

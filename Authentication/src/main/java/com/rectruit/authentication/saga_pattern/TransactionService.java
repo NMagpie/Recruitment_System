@@ -35,6 +35,7 @@ public class TransactionService {
         return !transactionLogs.isEmpty();
     }
 
+    @Transactional
     public TransactionLog prepare_document(Document document, TransactionLog.Action action, String collectionName) {
         MongoCollection<Document> collection = mongoTemplate.getCollection(collectionName);
         Document previousState = new Document();
@@ -65,10 +66,12 @@ public class TransactionService {
         return log;
     }
 
+    @Transactional
     public void saga_success(String transactionId) {
         transactionLogRepository.deleteById(new ObjectId(transactionId));
     }
 
+    @Transactional
     public void saga_fail(String transactionId) {
         // Get the transaction log object with the specified ID
         TransactionLog transactionLog = mongoTemplate.findById(new ObjectId(transactionId), TransactionLog.class);

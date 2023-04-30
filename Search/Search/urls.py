@@ -13,13 +13,21 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import socket
+import threading
+
+import schedule
 from django.contrib import admin
 from django.urls import path, include
 
-from Search.common_routes import search_data
+from Search.common_routes import search_data, health
 from Search.saga_pattern.saga_routes import get_saga_urls
 from Search.cv_routes import CV_View
 from Search.job_routes import Job_View
+from Search.serviceJWTAuthentication import initialize_token, schedule_loop, refresh_token
+
+import py_eureka_client.eureka_client as eureka_client
+from Search.settings import SERVICE_NAME, APP_PORT_VAR, EUREKA_URL_DEFAULT_ZONE
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,5 +39,21 @@ urlpatterns = [
     path('search/job/', search_data, name='search_job', kwargs={'search_type': 'job'}),
     path('search/cv/', search_data, name='search_cv_metadata', kwargs={'search_type': 'cv'}),
 
+    path('health', health, name='health'),
+
     path('', include(get_saga_urls()))
 ]
+
+# initialize_token()
+#
+# schedule_thread = threading.Thread(target=schedule_loop)
+# schedule_thread.start()
+#
+schedule.every(14).minutes.do(refresh_token)
+
+eureka_client.init(eureka_server=EUREKA_URL_DEFAULT_ZONE,
+                   app_name=SERVICE_NAME,
+                   instance_port=int(APP_PORT_VAR),
+                   instance_ip=socket.gethostbyname(socket.gethostname()),
+                   instance_host=socket.gethostbyname(socket.gethostname())
+                   )

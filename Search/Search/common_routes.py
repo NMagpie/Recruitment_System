@@ -1,10 +1,24 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from elasticsearch_dsl import Q, IllegalOperation
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .documents import CVMetadataDocument, JobDocument
+from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 
 
+@api_view(['GET'])
+@csrf_exempt
+def health():
+    return JsonResponse({'status': 'UP'}, status=200)
+
+
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def search_data(request, search_type):
     if request.method == 'GET':

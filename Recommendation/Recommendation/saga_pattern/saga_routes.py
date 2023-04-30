@@ -2,20 +2,29 @@ import json
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from Recommendation.saga_pattern.TransactionLogModel import TransactionLog
 from Recommendation.saga_pattern.saga_pattern_util import saga_fail, saga_success
 
 from django.urls import path
+
+from Recommendation.serviceJWTAuthentication import ServiceAuthJWTAuthentication
 
 
 # Saga Pattern Routes
 def get_saga_urls():
     return [
         path('rollback/', rollback_saga, name='rollback_saga'),
-        path('success/', success_saga, name='success_saga'),
+        path('success/', s_saga, name='s_saga'),
     ]
 
 
+@api_view(['POST'])
+@authentication_classes([
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def rollback_saga(request):
     if request.method == 'POST':
@@ -45,8 +54,12 @@ def rollback_saga(request):
         return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
 
+@api_view(['POST'])
+@authentication_classes([
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
-def success_saga(request):
+def s_saga(request):
     if request.method == 'POST':
         try:
             # Get the file hash and filename from the request

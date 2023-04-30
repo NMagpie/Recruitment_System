@@ -1,15 +1,19 @@
 import hashlib
 import json
 import os
+import socket
 
 from bson import ObjectId
-from django.core.management.commands.runserver import Command as runserver
 from django.forms import model_to_dict
 from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from .models import FileMetadata
 from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
+from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
+from .settings import APP_PORT_VAR
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -19,6 +23,17 @@ class CustomJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
+@api_view(['GET'])
+@csrf_exempt
+def health():
+    return JsonResponse({'status': 'UP'}, status=200)
+
+
+@api_view(['POST'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_cv(request):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -26,6 +41,8 @@ def upload_cv(request):
         cv_file = request.FILES['file']
         candidate_name = request.POST.get('candidate_name')
         user_id = request.POST.get('user_id')
+
+        file_binary = cv_file.read()
 
         # Check if the file is a PDF
         if cv_file.content_type != 'application/pdf':
@@ -39,17 +56,18 @@ def upload_cv(request):
         cv_updated_name = cv_file.name.replace(' ', '_')
 
         # Save the file to the local filesystem
-        cv_file_path = os.path.join('./temp/', f'{cv_file_hash}_{cv_updated_name}')
-        with open(cv_file_path, 'wb+') as destination:
-            for chunk in cv_file.chunks():
-                destination.write(chunk)
+        # cv_file_path = os.path.join('./temp/', f'{cv_file_hash}_{cv_updated_name}')
+        # with open(cv_file_path, 'wb+') as destination:
+        #     for chunk in cv_file.chunks():
+        #         destination.write(chunk)
 
         metadata = FileMetadata(_id=cv_file_hash,
                                 filename=cv_updated_name,
                                 filetype=cv_file.content_type,
                                 candidate_name=candidate_name,
                                 user_id=user_id,
-                                tags=['test321', '321test', 'djongo', 'pymongo'])
+                                tags=['test321', '321test', 'djongo', 'pymongo'],
+                                file=file_binary)
 
         transaction_id = prepare_document(metadata, 'create')
 
@@ -63,30 +81,35 @@ def upload_cv(request):
         return JsonResponse({'error': 'Invalid request method or missing file'}, status=400)
 
 
+@api_view(['DELETE'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
-def delete_cv(request):
+def delete_cv(request, id):
     if request.method == 'DELETE':
-        # Get the file hash and filename from the request
-        cv_file_hash = request.GET.get('file_hash')
-        cv_file_name = request.GET.get('file_name')
+        try:
+            # Get the file hash and filename from the request
 
-        filename = f'{cv_file_hash}_{cv_file_name}'
+            metadata = FileMetadata.objects.get(_id=ObjectId(id))
 
-        # Delete the file from the local filesystem
-        cv_file_path = os.path.join('./uploaded_CVs/', filename)
-        os.rename(cv_file_path, './temp/' + filename)
+            transaction_id = prepare_document(metadata, 'delete')
 
-        # Delete the metadata from the database
-        metadata = FileMetadata.objects.filter(_id=ObjectId(cv_file_hash)).first()
+            # Return a success response
+            return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
-        transaction_id = prepare_document(metadata, 'delete')
-
-        # Return a success response
-        return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
+        except FileMetadata.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'CV Not Found'}, status=404)
     else:
-        return JsonResponse({'error': 'Invalid request method'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
 
 
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def cv_details(request, id):
     try:
@@ -96,28 +119,32 @@ def cv_details(request, id):
             'filename': cv_file.filename,
             'filetype': cv_file.filetype,
             'candidate_name': cv_file.candidate_name,
-            'user_id': cv_file.user_id,
-            'download_link': f'https://{runserver.default_addr}:{runserver.default_port}/cv/download/{str(cv_file._id)}_{cv_file.filename}'
+            'user_id': cv_file.user_id
         }
         return JsonResponse(response, status=200)
     except FileMetadata.DoesNotExist:
         return JsonResponse({'error': 'CV file does not exist'}, status=404)
 
 
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication
+])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
-def cv_download(request, filename):
-
-    if '/../' in filename:
+def cv_download(request, id):
+    if '../' in id:
         return JsonResponse({'error': 'Invalid file path'}, status=400)
 
-    file_path = os.path.join('./uploaded_CVs', filename)
+    try:
 
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as file:
-            response = HttpResponse(file.read())
-            response['Content-Type'] = 'application/pdf'
-            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        metadata = FileMetadata.objects.get(_id=ObjectId(id))
 
-            return response
-    else:
+        response = HttpResponse(metadata.file)
+        response['Content-Type'] = metadata.filetype
+        response['Content-Disposition'] = f'attachment; filename="{metadata.filename}"'
+
+        return response
+    except FileMetadata.DoesNotExist:
         return JsonResponse({'error': 'CV file does not exist'}, status=404)

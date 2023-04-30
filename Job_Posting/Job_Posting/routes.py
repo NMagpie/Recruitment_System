@@ -1,13 +1,28 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 from .models import Job
 import json
 from bson import ObjectId
 from django.forms import model_to_dict
 
 from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
+from .serviceJWTAuthentication import ServiceAuthJWTAuthentication, AuthorizationJWTAuthentication
 
 
+@api_view(['GET'])
+@csrf_exempt
+def health():
+    return JsonResponse({'status': 'UP'}, status=200)
+
+
+@api_view(['POST'])
+# @authentication_classes([
+#     AuthorizationJWTAuthentication,
+#     ServiceAuthJWTAuthentication])
+# @permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_job(request):
     if request.method == 'POST':
@@ -34,6 +49,11 @@ def upload_job(request):
         return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
 
+@api_view(['GET', 'PUT', 'DELETE'])
+# @authentication_classes([
+#     AuthorizationJWTAuthentication,
+#     ServiceAuthJWTAuthentication])
+# @permission_classes([IsAuthenticated])
 @csrf_exempt
 def rud_job(request, id):
     try:
