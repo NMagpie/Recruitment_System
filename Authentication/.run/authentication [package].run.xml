@@ -11,10 +11,6 @@
           <option name="goals">
             <list>
               <option value="-D" />
-              <option value="REFRESH_URL=https://host.docker.internal:8001/auth/refresh" />
-              <option value="-D" />
-              <option value="REGISTER_URL=https://host.docker.internal:8001/auth/register" />
-              <option value="-D" />
               <option value="DB_HOST=host.docker.internal" />
               <option value="-D" />
               <option value="SHARED_SECRET_KEY=TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234" />

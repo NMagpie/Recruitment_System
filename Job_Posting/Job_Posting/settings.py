@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'Job_Posting.wsgi.application'
 
 # Authorization
 
-SERVICE_NAME = 'job_posting'
+SERVICE_NAME = 'job-posting'
 
 REGISTER_URL = os.environ.get("REGISTER_URL")
 

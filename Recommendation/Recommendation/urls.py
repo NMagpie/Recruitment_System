@@ -50,4 +50,7 @@ eureka_client.init(eureka_server=EUREKA_URL_DEFAULT_ZONE,
                    app_name=SERVICE_NAME,
                    instance_port=int(APP_PORT_VAR),
                    instance_ip=socket.gethostbyname(socket.gethostname()),
-                   instance_host=socket.gethostbyname(socket.gethostname()))
+                   instance_host=socket.gethostbyname(socket.gethostname()),
+                   instance_secure_port_enabled=True,
+                   instance_secure_port=int(APP_PORT_VAR)
+                   )
