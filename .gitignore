@@ -160,4 +160,4 @@ GitHub.sublime-settings
 secrets/
 
 # Files and etc.
-uploaded_CVs/
+mongo/mongodb/**
