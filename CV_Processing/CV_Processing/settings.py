@@ -151,7 +151,7 @@ WSGI_APPLICATION = 'CV_Processing.wsgi.application'
 
 # Authorization
 
-SERVICE_NAME = 'cv_processing'
+SERVICE_NAME = 'cv-processing'
 
 REGISTER_URL = os.environ.get("REGISTER_URL")
 

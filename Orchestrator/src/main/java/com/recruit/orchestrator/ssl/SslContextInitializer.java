@@ -45,12 +45,7 @@ public class SslContextInitializer {
                 getClass().getResourceAsStream(this.trustStore)
                 : new FileInputStream(this.trustStore);
 
-        //new FileInputStream(this.keyStore)
         keyStore.load(keyStoreIS, this.keyStorePassword);
-
-        System.out.println(getKeyStore());
-
-        System.out.println(getTrustStore());
 
         // Initialize a KeyManagerFactory with the loaded keystore
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());

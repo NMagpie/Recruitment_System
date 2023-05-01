@@ -119,11 +119,11 @@ public class SagaController {
         HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
 
         try {
-            ServiceInstance cvProcessing = loadBalancer.choose("CV_PROCESSING");
+            ServiceInstance cvProcessing = loadBalancer.choose("CV-PROCESSING");
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance recommendation = loadBalancer.choose("RECOMMENDATION");
 
-            // POST REQUEST TO CV_PROCESSING
+            // POST REQUEST TO CV-PROCESSING
 
             MultiValueMap<String, Object> cv_request = new LinkedMultiValueMap<>();
             cv_request.set("file", new MultipartInputStreamFileResource(file.getInputStream(), file.getOriginalFilename()));
@@ -202,11 +202,11 @@ public class SagaController {
         HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
 
         try {
-            ServiceInstance jobPosting = loadBalancer.choose("JOB_POSTING");
+            ServiceInstance jobPosting = loadBalancer.choose("JOB-POSTING");
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance recommendation = loadBalancer.choose("RECOMMENDATION");
 
-            // POST REQUEST TO JOB_POSTING
+            // POST REQUEST TO JOB-POSTING
 
             String jobUrl = jobPosting.getUri().toString().replace("http://", "https://") + "/jobs/";
 
@@ -338,9 +338,9 @@ public class SagaController {
 
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
-            ServiceInstance cv = loadBalancer.choose("CV_PROCESSING");
+            ServiceInstance cv = loadBalancer.choose("CV-PROCESSING");
 
-            // GET REQUEST TO CV_PROCESSING
+            // GET REQUEST TO CV-PROCESSING
 
             String cvUrl = cv.getUri().toString().replace("http://", "https://") +
                         "/cv/delete/" + id;
@@ -394,9 +394,9 @@ public class SagaController {
 
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
-            ServiceInstance job = loadBalancer.choose("JOB_POSTING");
+            ServiceInstance job = loadBalancer.choose("JOB-POSTING");
 
-            // GET REQUEST TO CV_PROCESSING
+            // GET REQUEST TO JOB-POSTING
 
             String jobUrl = job.getUri().toString().replace("http://", "https://") +
                     "/jobs/" + id;

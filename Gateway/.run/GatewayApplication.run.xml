@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <envs>
+      <env name="SHARED_SECRET_KEY" value="TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234" />
+      <env name="SSL_PASSWORD" value="rootroot" />
+    </envs>
+    <module name="gateway" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.recruiter.gateway.GatewayApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -23,6 +23,18 @@ services:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ./mongo/mongodb:/var/lib/mongodb:rw
 
+  gateway:
+    container_name: gateway
+    restart: always
+    build: ./Gateway
+    depends_on:
+      - eureka
+    ports:
+      - "8000:8000"
+    environment:
+      EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
+      EUREKA_URL: http://eureka:8761
+
   orchestrator:
     container_name: orchestrator
     restart: always
