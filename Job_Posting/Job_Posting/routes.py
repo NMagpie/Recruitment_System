@@ -1,3 +1,5 @@
+import PyPDF2 as PyPDF2
+import spacy
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -11,6 +13,8 @@ from django.forms import model_to_dict
 from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 from .serviceJWTAuthentication import ServiceAuthJWTAuthentication, AuthorizationJWTAuthentication
 
+nlp = spacy.load('en_core_web_sm')
+
 
 @api_view(['GET'])
 @csrf_exempt
@@ -19,10 +23,10 @@ def health():
 
 
 @api_view(['POST'])
-# @authentication_classes([
-#     AuthorizationJWTAuthentication,
-#     ServiceAuthJWTAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_job(request):
     if request.method == 'POST':
@@ -32,11 +36,20 @@ def upload_job(request):
             title=data['title'],
             description=data['description'],
             location=data['location'],
-            tags=['test', 'test123', 'django', 'python']
+            tags=[]
         )
 
         if is_document_locked(str(job._id), Job):
             return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
+
+        doc = nlp(data['description'])
+
+        keywords = set()
+        for token in doc:
+            if not token.is_stop and token.is_alpha and token.pos_ in ['NOUN', 'PROPN']:
+                keywords.add(token.text)
+
+        job.tags = list(keywords)
 
         transaction_id = prepare_document(job, 'create')
 
@@ -50,10 +63,10 @@ def upload_job(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-# @authentication_classes([
-#     AuthorizationJWTAuthentication,
-#     ServiceAuthJWTAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
 @csrf_exempt
 def rud_job(request, id):
     try:
@@ -95,3 +108,11 @@ def rud_job(request, id):
         return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+def extract_text_from_pdf(file):
+    pdf_reader = PyPDF2.PdfReader(file)
+    text = ''
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
