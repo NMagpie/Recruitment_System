@@ -3,6 +3,8 @@ import json
 import os
 import socket
 
+import PyPDF2
+import spacy as spacy
 from bson import ObjectId
 from django.forms import model_to_dict
 from django.http import HttpResponseBadRequest, HttpResponse, JsonResponse
@@ -14,6 +16,8 @@ from .models import FileMetadata
 from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 from .settings import APP_PORT_VAR
+
+nlp = spacy.load('en_core_web_sm')
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -55,18 +59,21 @@ def upload_cv(request):
 
         cv_updated_name = cv_file.name.replace(' ', '_')
 
-        # Save the file to the local filesystem
-        # cv_file_path = os.path.join('./temp/', f'{cv_file_hash}_{cv_updated_name}')
-        # with open(cv_file_path, 'wb+') as destination:
-        #     for chunk in cv_file.chunks():
-        #         destination.write(chunk)
+        text = extract_text_from_pdf(cv_file)
+
+        doc = nlp(text)
+
+        keywords = set()
+        for token in doc:
+            if not token.is_stop and token.is_alpha and token.pos_ in ['NOUN', 'PROPN']:
+                keywords.add(token.text)
 
         metadata = FileMetadata(_id=cv_file_hash,
                                 filename=cv_updated_name,
                                 filetype=cv_file.content_type,
                                 candidate_name=candidate_name,
                                 user_id=user_id,
-                                tags=['test321', '321test', 'djongo', 'pymongo'],
+                                tags=list(keywords),
                                 file=file_binary)
 
         transaction_id = prepare_document(metadata, 'create')
@@ -90,8 +97,6 @@ def upload_cv(request):
 def delete_cv(request, id):
     if request.method == 'DELETE':
         try:
-            # Get the file hash and filename from the request
-
             metadata = FileMetadata.objects.get(_id=ObjectId(id))
 
             transaction_id = prepare_document(metadata, 'delete')
@@ -148,3 +153,11 @@ def cv_download(request, id):
         return response
     except FileMetadata.DoesNotExist:
         return JsonResponse({'error': 'CV file does not exist'}, status=404)
+
+
+def extract_text_from_pdf(file):
+    pdf_reader = PyPDF2.PdfReader(file)
+    text = ''
+    for page in pdf_reader.pages:
+        text += page.extract_text()
+    return text
