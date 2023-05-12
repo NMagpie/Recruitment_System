@@ -31,7 +31,7 @@ class GatewayConfiguration {
 
     @Bean
     @LoadBalanced
-    fun webClient() : WebClient {
+    fun webClient(): WebClient {
 
         val httpClient = HttpClient.create()
             .secure { sslSpec -> sslSpec.sslContext(sslContext) }
@@ -42,10 +42,10 @@ class GatewayConfiguration {
     }
 
     @Bean
-    fun httpClient() : HttpClient {
+    fun httpClient(): HttpClient {
 
-        return HttpClient.create().secure {
-            sslContextSpec -> sslContextSpec.sslContext(sslContext)
+        return HttpClient.create().secure { sslContextSpec ->
+            sslContextSpec.sslContext(sslContext)
         }
 
     }
@@ -54,157 +54,157 @@ class GatewayConfiguration {
     fun gatewayRoutes(builder: RouteLocatorBuilder): RouteLocator {
 
         return builder.routes()
-                // AUTHENTICATION ROUTES
-                .route { r ->
-                    r.path("/login")
-                            .and()
-                            .method(HttpMethod.POST)
-                            .filters {f ->
-                                defaultFilter(f, false)
-                                f.rewritePath("/login", "/auth/login")
-                            }
-                            .uri("lb://AUTHENTICATION")
-                }
-                .route { r ->
-                    r.path("/refresh_token")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters {f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://AUTHENTICATION")
-                }
+            // AUTHENTICATION ROUTES
+            .route { r ->
+                r.path("/login")
+                    .and()
+                    .method(HttpMethod.POST)
+                    .filters { f ->
+                        defaultFilter(f, false)
+                        f.rewritePath("/login", "/auth/login")
+                    }
+                    .uri("lb://AUTHENTICATION")
+            }
+            .route { r ->
+                r.path("/refresh_token")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://AUTHENTICATION")
+            }
 
-                .route { r ->
-                    r.path("/user/**")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters{ f ->
-                                defaultFilter(f,true)
-                            }
-                            .uri("lb://AUTHENTICATION")
-                }
+            .route { r ->
+                r.path("/user/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://AUTHENTICATION")
+            }
 
-                // RECOMMENDATION ROUTES
+            // RECOMMENDATION ROUTES
 
-                .route { r ->
-                    r.path("/recommendation/**")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters{ f ->
-                                defaultFilter(f,true)
-                                f.rewritePath("/recommendation/", "/recommendation/?_id=")
-                            }
-                            .uri("lb://recommendation")
-                }
+            .route { r ->
+                r.path("/recommendation/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                        f.rewritePath("/recommendation/", "/recommendation/?_id=")
+                    }
+                    .uri("lb://recommendation")
+            }
 
-                // CV PROCESSING ROUTES
+            // CV PROCESSING ROUTES
 
-                .route { r ->
-                    r.path("/cv/download/**")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters { f ->
-                                f.rewritePath("http://" , "https://")
-                                f.filter(HeaderGatewayFilter())
-                            }
-                            .uri("lb://CV-PROCESSING")
-                }
+            .route { r ->
+                r.path("/cv/download/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        f.rewritePath("http://", "https://")
+                        f.filter(HeaderGatewayFilter())
+                    }
+                    .uri("lb://CV-PROCESSING")
+            }
 
-                .route { r ->
-                    r.path("/cv/**")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://CV-PROCESSING")
-                }
+            .route { r ->
+                r.path("/cv/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://CV-PROCESSING")
+            }
 
-                // JOB POSTING ROUTES
+            // JOB POSTING ROUTES
 
-                .route { r ->
-                    r.path("/job/**")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                                f.rewritePath("/job/", "/jobs/")
-                            }
-                            .uri("lb://JOB-POSTING")
-                }
+            .route { r ->
+                r.path("/job/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                        f.rewritePath("/job/", "/jobs/")
+                    }
+                    .uri("lb://JOB-POSTING")
+            }
 
-                // SAGA ROUTES
+            // SAGA ROUTES
 
-                .route { r->
-                    r.path("/register")
-                            .and()
-                            .method(HttpMethod.POST)
-                            .filters { f ->
-                                defaultFilter(f, false)
-                            }
-                            .uri("lb://ORCHESTRATOR")
-                }
+            .route { r ->
+                r.path("/register")
+                    .and()
+                    .method(HttpMethod.POST)
+                    .filters { f ->
+                        defaultFilter(f, false)
+                    }
+                    .uri("lb://ORCHESTRATOR")
+            }
 
-                .route { r->
-                    r.path("/upload_cv")
-                            .and()
-                            .method(HttpMethod.POST)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://ORCHESTRATOR")
-                }
+            .route { r ->
+                r.path("/upload_cv")
+                    .and()
+                    .method(HttpMethod.POST)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://ORCHESTRATOR")
+            }
 
-                .route { r->
-                    r.path("/upload_job")
-                            .and()
-                            .method(HttpMethod.POST)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://ORCHESTRATOR")
-                }
+            .route { r ->
+                r.path("/upload_job")
+                    .and()
+                    .method(HttpMethod.POST)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://ORCHESTRATOR")
+            }
 
-                .route { r->
-                    r.path("/search/**")
-                            .and()
-                            .method(HttpMethod.GET)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://ORCHESTRATOR")
-                }
+            .route { r ->
+                r.path("/search/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://ORCHESTRATOR")
+            }
 
-                .route { r->
-                    r.path("/delete_cv/**")
-                            .and()
-                            .method(HttpMethod.DELETE)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://ORCHESTRATOR")
-                }
+            .route { r ->
+                r.path("/delete_cv/**")
+                    .and()
+                    .method(HttpMethod.DELETE)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://ORCHESTRATOR")
+            }
 
-                .route { r->
-                    r.path("/delete_job/**")
-                            .and()
-                            .method(HttpMethod.DELETE)
-                            .filters { f ->
-                                defaultFilter(f, true)
-                            }
-                            .uri("lb://ORCHESTRATOR")
-                }
+            .route { r ->
+                r.path("/delete_job/**")
+                    .and()
+                    .method(HttpMethod.DELETE)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://ORCHESTRATOR")
+            }
 
-                .build()
+            .build()
     }
 
     fun defaultFilter(f: GatewayFilterSpec, auth: Boolean): GatewayFilterSpec {
-            if (auth)
-                f.filter(jwtGatewayFilter)
-            f.rewritePath("http://", "https://")
-            f.addRequestHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            f.filter(HeaderGatewayFilter())
+        if (auth)
+            f.filter(jwtGatewayFilter)
+        f.rewritePath("http://", "https://")
+        f.addRequestHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        f.filter(HeaderGatewayFilter())
         return f
     }
 

@@ -50,7 +50,12 @@ def search_data(request, search_type):
                 .extra(size=10, from_=10 * offset)
 
             count = search_results.count(),
-            results = [(result.to_dict()) for result in search_results]
+            results = [
+                {
+                    key: value for key, value in result.items() if key != 'tags'
+                }
+                for result in search_results
+            ]
 
         except IllegalOperation:
             return JsonResponse({'status': 'error', 'message': 'invalid search query'}, status=400)

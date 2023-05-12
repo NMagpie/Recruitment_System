@@ -4,10 +4,6 @@ import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.UnsupportedJwtException
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.server.reactive.ServerHttpRequest
@@ -22,6 +18,7 @@ import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
+import java.nio.charset.Charset
 
 class JwtAuthenticationFilter(private val jwtSecret: String) : WebFilter {
 
@@ -36,37 +33,46 @@ class JwtAuthenticationFilter(private val jwtSecret: String) : WebFilter {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject
     }
 
-    private fun validateJwtToken(authToken: String?): Boolean {
-        try {
+    private fun validateJwtToken(authToken: String): Pair<Boolean, String> {
+        return try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken)
-            return true
+            Pair(true, "")
         } catch (e: MalformedJwtException) {
-            println("Invalid JWT token: " + e.message)
+            Pair(false, "Invalid JWT token: " + e.message)
         } catch (e: ExpiredJwtException) {
-            println("JWT token is expired: " + e.message)
+            Pair(false, "JWT token is expired: " + e.message)
         } catch (e: UnsupportedJwtException) {
-            println("JWT token is unsupported: " + e.message)
+            Pair(false, "JWT token is unsupported: " + e.message)
         } catch (e: IllegalArgumentException) {
-            println("JWT claims string is empty: " + e.message)
+            Pair(false, "JWT claims string is empty: " + e.message)
         }
-        return false
     }
 
     override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
         val token = parseJwt(exchange.request)
         if (token != null) {
             val userId = getUserId(token)
-            if (validateJwtToken(token)) {
+
+            val validationPair = validateJwtToken(token)
+
+            return if (validationPair.first) {
                 val auth: Authentication = UsernamePasswordAuthenticationToken(userId, null, null)
-                return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
+                chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth))
+            } else {
+                unauthorized(exchange, validationPair.second)
             }
         }
         return unauthorized(exchange)
     }
 
-    private fun unauthorized(exchange: ServerWebExchange): Mono<Void> {
+    private fun unauthorized(
+        exchange: ServerWebExchange,
+        errorMessage: String = "Unauthorized Access. Please provide a valid token."
+    ): Mono<Void> {
         exchange.response.statusCode = HttpStatus.UNAUTHORIZED
         exchange.response.headers.set(HttpHeaders.WWW_AUTHENTICATE, "Bearer realm=\"Unauthorized\", charset=\"UTF-8\"")
-        return exchange.response.setComplete()
+
+        val buffer = exchange.response.bufferFactory().wrap(errorMessage.toByteArray(Charset.defaultCharset()))
+        return exchange.response.writeWith(Mono.just(buffer))
     }
 }

@@ -9,6 +9,8 @@ RUN pip install -r requirements.txt
 
 RUN pip install --force-reinstall -v "pymongo==3.12.3"
 
+RUN python -m spacy download en_core_web_sm
+
 COPY . .
 
 EXPOSE ${APP_PORT_VAR} ${APP_PORT_VAR}

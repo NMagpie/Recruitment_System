@@ -1,4 +1,5 @@
 import json
+from random import shuffle
 
 from bson import ObjectId
 from django.http import JsonResponse
@@ -6,10 +7,12 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from Recommendation.models import UserData
+from Recommendation.models import UserData, CVMetadata, Job
 from Recommendation.saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 from Recommendation.serviceJWTAuthentication import ServiceAuthJWTAuthentication, AuthorizationJWTAuthentication
-
+from django.db.models import Q
+from functools import reduce
+import operator
 
 @api_view(['GET'])
 @csrf_exempt
@@ -33,10 +36,48 @@ def get_recommendations(request):
 
             userData = UserData.objects.get(_id=ObjectId(user_id))
 
-            recommendations = list(set(userData.tags + userData.searches))
+            user_tags = userData.tags
+
+            shuffle(user_tags)
+
+            user_searches = userData.searches
+
+            shuffle(user_searches)
+
+            queryset = UserData.objects.all()
+
+            users = queryset.filter(reduce(operator.or_, (Q(tags__icontains=tag) for tag in user_tags)))
+
+            ranked_users = sorted(users, key=lambda u: len(set(u.tags) & set(user_tags)), reverse=True)
+            similar_users = ranked_users[:10]
+
+            similar_tags = [tag
+                            for user in similar_users
+                            for tag in user.tags]
+
+            shuffle(similar_tags)
+
+            limit = 20 if userData.type == 'user' else 100
+
+            recommendations = list(set(user_searches[:limit] + user_tags[:limit] + similar_tags[:limit]))
+
+            document_type = Job if userData.type == 'user' else CVMetadata
+
+            queryset = document_type.objects.all()
+
+            documents = queryset.filter(reduce(operator.or_, (Q(tags__icontains=tag) for tag in recommendations)))
+
+            ranked_documents = sorted(documents, key=lambda d: len(set(d.tags) & set(recommendations)), reverse=True)
+            recommended_documents = [
+                {
+                    k: str(v) if k == '_id' else v for k,
+                    v in doc.__dict__.items() if k != 'tags' and k != '_state'
+                }
+                for doc in ranked_documents[:10]
+            ]
 
             # Return a success response
-            return JsonResponse({'status': 'success', 'recommendations': recommendations}, status=200)
+            return JsonResponse({'status': 'success', 'recommendations': recommended_documents}, status=200)
 
         except UserData.DoesNotExist:
             # Handle errors caused by trying to delete a non-existent object
@@ -51,8 +92,8 @@ def get_recommendations(request):
 
 @api_view(['POST'])
 @authentication_classes([
-   AuthorizationJWTAuthentication,
-   ServiceAuthJWTAuthentication])
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
 @permission_classes([IsAuthenticated])
 @csrf_exempt
 def upload_user(request):
@@ -122,7 +163,7 @@ def upload_tags(request):
                     not tags:
                 return JsonResponse({'status': 'error', 'message': 'required fields are missing'}, status=400)
 
-            limit = 30 if userData.type == 'user' else 100
+            limit = 250 if userData.type == 'user' else 3000
 
             tags = list(set(tags + userData.tags))[:limit]
 
@@ -168,7 +209,7 @@ def upload_searches(request):
                     not searches:
                 return JsonResponse({'status': 'error', 'message': 'required fields are missing'}, status=400)
 
-            limit = 30 if userData.type == 'user' else 100
+            limit = 250 if userData.type == 'user' else 3000
 
             searches = list(set(searches + userData.searches))[:limit]
 

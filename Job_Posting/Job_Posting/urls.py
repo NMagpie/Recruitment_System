@@ -15,14 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import socket
-import threading
 
 import schedule
 from django.contrib import admin
 from django.urls import path, include
 from .routes import upload_job, rud_job, health
 from .saga_pattern.saga_routes import get_saga_urls
-from .serviceJWTAuthentication import initialize_token, schedule_loop, refresh_token
+from .serviceJWTAuthentication import refresh_token, schedule_loop, initialize_token
 import py_eureka_client.eureka_client as eureka_client
 from Job_Posting.settings import SERVICE_NAME, APP_PORT_VAR, EUREKA_URL_DEFAULT_ZONE
 
@@ -36,18 +35,4 @@ urlpatterns = [
     path('', include(get_saga_urls()))
 ]
 
-# initialize_token()
-#
-# schedule_thread = threading.Thread(target=schedule_loop)
-# schedule_thread.start()
-#
-schedule.every(14).minutes.do(refresh_token)
-
-eureka_client.init(eureka_server=EUREKA_URL_DEFAULT_ZONE,
-                   app_name=SERVICE_NAME,
-                   instance_port=int(APP_PORT_VAR),
-                   instance_ip=socket.gethostbyname(socket.gethostname()),
-                   instance_host=socket.gethostbyname(socket.gethostname()),
-                   instance_secure_port_enabled=True,
-                   instance_secure_port=int(APP_PORT_VAR)
-                   )
+initialize_token()
