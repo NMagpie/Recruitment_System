@@ -8,8 +8,8 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Job
-from .saga_pattern.saga_pattern_util import is_document_locked, prepare_document
+from .models import CVMetadata
+from Recommendation.saga_pattern.saga_pattern_util import is_document_locked, prepare_document
 from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAuthJWTAuthentication
 
 
@@ -18,69 +18,72 @@ from .serviceJWTAuthentication import AuthorizationJWTAuthentication, ServiceAut
     ServiceAuthJWTAuthentication])
 @permission_classes([IsAuthenticated])
 @method_decorator(csrf_exempt, name='dispatch')
-class Job_View(View):
+class CV_View(View):
 
     def post(self, request):
         if request.method == 'POST':
+
             try:
                 data = json.loads(request.body)
 
                 _id = data.get('_id')
+                filename = data.get('filename')
+                filetype = data.get('filetype')
+                candidate_name = data.get('candidate_name')
                 user_id = data.get('user_id')
-                title = data.get('title')
-                description = data.get('description')
-                location = data.get('location')
                 tags = data.get('tags')
 
-                if is_document_locked(_id, Job):
+                if is_document_locked(_id, CVMetadata):
                     return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
                 if not _id or \
+                        not filename or \
+                        not filetype or \
+                        not candidate_name or \
                         not user_id or \
-                        not title or \
-                        not description or \
-                        not location or \
                         not tags:
                     return JsonResponse({'status': 'error', 'message': 'required fields are missing'}, status=400)
 
-                job = Job(
+                cv_metadata = CVMetadata(
                     _id=ObjectId(_id),
+                    filename=filename,
+                    filetype=filetype,
+                    candidate_name=candidate_name,
                     user_id=user_id,
-                    title=title,
-                    description=description,
-                    location=location,
                     tags=tags
                 )
 
-                transaction_id = prepare_document(job)
+                transaction_id = prepare_document(cv_metadata)
 
                 return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
+
             except json.JSONDecodeError:
                 return JsonResponse({'status': 'error', 'message': 'invalid JSON format in request body'}, status=400)
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'invalid request method'}, status=400)
 
     def delete(self, request):
+
         if request.method == 'DELETE':
             try:
-                job_id = request.GET.get('_id')
+                cv_id = request.GET.get('_id')
 
-                if not job_id:
+                if not cv_id:
                     return JsonResponse({'status': 'error', 'message': 'missing argument: _id'}, status=400)
 
-                if is_document_locked(job_id, Job):
+                if is_document_locked(cv_id, CVMetadata):
                     return JsonResponse({'status': 'error', 'message': 'document is locked'}, status=400)
 
-                document = Job.objects.filter(_id=ObjectId(job_id)).first()
+                document = CVMetadata.objects.filter(_id=ObjectId(cv_id)).first()
 
-                # Delete the data from the database
+                # Delete the metadata from the database
                 transaction_id = prepare_document(document, 'delete')
 
                 # Return a success response
                 return JsonResponse({'status': 'success', 'transaction_id': transaction_id}, status=200)
 
-            except Job.DoesNotExist:
+            except CVMetadata.DoesNotExist:
                 # Handle errors caused by trying to delete a non-existent object
-                return JsonResponse({'error': 'Job data not found'}, status=404)
+                return JsonResponse({'error': 'CV data not found'}, status=404)
             except Exception as e:
                 # Handle all other exceptions
                 print(e)

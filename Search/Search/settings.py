@@ -66,7 +66,11 @@ ELASTIC_USER = os.environ.get("ELASTIC_USER")
 
 ELASTIC_PASSWORD = os.environ.get("ELASTIC_PASSWORD")
 
-elk_base_url = 'https://{user_name}:{password}@{host_ip}:{host_port}'
+IS_DOCKER = os.environ.get("IS_DOCKER")
+
+ELASTIC_PROTOCOL = 'https' if IS_DOCKER is None or IS_DOCKER == 'false' else 'http'
+
+elk_base_url = ELASTIC_PROTOCOL + '://{user_name}:{password}@{host_ip}:{host_port}'
 elastic_search_url = elk_base_url.format(user_name=ELASTIC_USER,
                                          password=urlquote(ELASTIC_PASSWORD),
                                          host_ip=ELASTIC_HOST,

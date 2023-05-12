@@ -4,6 +4,8 @@ WORKDIR /app
 
 ENV APP_PORT_VAR ${APP_PORT:-8005}
 
+ENV IS_DOCKER true
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 

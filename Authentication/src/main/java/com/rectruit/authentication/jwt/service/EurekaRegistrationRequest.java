@@ -29,4 +29,3 @@ public class EurekaRegistrationRequest {
     @Setter
     private int port;
 }
-

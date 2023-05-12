@@ -23,6 +23,21 @@ services:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ./mongo/mongodb:/var/lib/mongodb:rw
 
+  elasticsearch:
+    container_name: elasticsearch
+    restart: always
+    image: 'bitnami/elasticsearch:latest'
+    ports:
+      - "9200:9200"
+    environment:
+      ELASTICSEARCH_PORT_NUMBER: 9200
+      ELASTICSEARCH_DATA_DIR_LIST: /elasticsearch/data
+
+    volumes:
+      - ./elasticsearch/data:/elasticsearch/data:rw
+      #- ./elasticsearch/elasticsearch.yml:/opt/bitnami/elasticsearch/config/elasticsearch.yml
+      #- ./elasticsearch/certs:/opt/bitnami/elasticsearch/config/certs:rw
+
   gateway:
     container_name: gateway
     restart: always
@@ -97,6 +112,7 @@ services:
     restart: always
     build: ./Search
     depends_on:
+      - elasticsearch
       - eureka
       - mongo
     ports:
@@ -104,7 +120,8 @@ services:
     environment:
       DB_HOST: mongo
       #DB_HOST: host.docker.internal
-      ELASTIC_HOST: host.docker.internal
+      #ELASTIC_HOST: host.docker.internal
+      ELASTIC_HOST: elasticsearch
       EUREKA_URL_DEFAULT_ZONE: http://eureka:8761/eureka
       EUREKA_URL: http://eureka:8761
 

@@ -20,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,7 +43,7 @@ public class SagaController {
     @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> register_user(@RequestBody Map<String, Object> user) {
 
-        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 
         try {
 
@@ -64,7 +62,7 @@ public class SagaController {
             HttpEntity<Map<String, Object>> authRequestEntity = new HttpEntity<>(user, authHeaders);
             ResponseEntity<HashMap> authResponseEntity = restTemplate.exchange(authUrl, HttpMethod.POST, authRequestEntity, HashMap.class);
 
-            affectedServices.put(authentication, (String) authResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(authentication, new ArrayList<>(Arrays.asList((String) authResponseEntity.getBody().get("transaction_id"))));
             check_status(authResponseEntity.getBody().get("status"));
 
             String userId = (String) authResponseEntity.getBody().get("user_id");
@@ -85,7 +83,7 @@ public class SagaController {
             HttpEntity<Map<String, String>> recRequestEntity = new HttpEntity<>(recRequestBody, recHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(recommendation, new ArrayList<>(Arrays.asList((String) recResponseEntity.getBody().get("transaction_id"))));
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -116,7 +114,7 @@ public class SagaController {
                                   @RequestParam("candidate_name") String candidateName,
                                   @RequestParam("user_id") String userId) {
 
-        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance cvProcessing = loadBalancer.choose("CV-PROCESSING");
@@ -142,12 +140,12 @@ public class SagaController {
 
             Map<String, Object> cvResponseMap = objectMapper.readValue(cvResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
 
-            affectedServices.put(cvProcessing, (String) cvResponseMap.get("transaction_id"));
+            affectedServices.put(cvProcessing, new ArrayList<>(Arrays.asList((String) cvResponseMap.get("transaction_id"))));
             check_status(cvResponseMap.get("status"));
 
             HashMap<String, Object> data = (HashMap) cvResponseMap.get("data");
 
-            // POST REQUEST TO RECOMMEND
+            // POST REQUEST TO RECOMMEND ABOUT USER
 
             String recUrl = recommendation.getUri().toString().replace("http://", "https://") + "/tags/";
             HttpHeaders recHeaders = new HttpHeaders();
@@ -162,7 +160,7 @@ public class SagaController {
             HttpEntity<Map<String, Object>> recRequestEntity = new HttpEntity<>(recRequest, recHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(recommendation, new ArrayList<>(Arrays.asList((String) recResponseEntity.getBody().get("transaction_id"))));
             check_status(recResponseEntity.getBody().get("status"));
 
             // POST REQUEST TO SEARCH
@@ -172,7 +170,21 @@ public class SagaController {
             HttpEntity<HashMap<String, Object>> searchRequestEntity = new HttpEntity<>(data, recHeaders);
             ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.POST, searchRequestEntity, HashMap.class);
 
-            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(search, new ArrayList<>(Arrays.asList((String) searchResponseEntity.getBody().get("transaction_id"))));
+            check_status(searchResponseEntity.getBody().get("status"));
+
+            // POST REQUEST TO RECOMMEND ABOUT DOCUMENT
+
+            recUrl = recommendation.getUri().toString().replace("http://", "https://") + "/cv/";
+
+            recRequestEntity = new HttpEntity<>(data, recHeaders);
+            recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
+
+            List<String> recTransactionsList = affectedServices.get(recommendation);
+
+            recTransactionsList.add((String) recResponseEntity.getBody().get("transaction_id"));
+
+            affectedServices.put(recommendation, recTransactionsList);
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -189,6 +201,7 @@ public class SagaController {
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
+            e.printStackTrace();
             String errorResponse = e.getMessage();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -199,7 +212,7 @@ public class SagaController {
     public ResponseEntity<String> upload_job(@RequestHeader(value = "Authorization") String authHeader,
                                   @RequestBody Map<String, Object> job) {
 
-        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance jobPosting = loadBalancer.choose("JOB-POSTING");
@@ -220,12 +233,12 @@ public class SagaController {
 
             Map<String, Object> cvResponseMap = objectMapper.readValue(jobResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
 
-            affectedServices.put(jobPosting, (String) cvResponseMap.get("transaction_id"));
+            affectedServices.put(jobPosting, new ArrayList<>(Arrays.asList((String) cvResponseMap.get("transaction_id"))));
             check_status(cvResponseMap.get("status"));
 
             HashMap<String, Object> data = (HashMap) cvResponseMap.get("data");
 
-            // POST REQUEST TO RECOMMEND
+            // POST REQUEST TO RECOMMEND ABOUT USER
 
             String recUrl = recommendation.getUri().toString().replace("http://", "https://") + "/tags/";
 
@@ -236,7 +249,7 @@ public class SagaController {
             HttpEntity<Map<String, Object>> recRequestEntity = new HttpEntity<>(recRequest, authHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(recommendation, new ArrayList<>(Arrays.asList((String) recResponseEntity.getBody().get("transaction_id"))));
             check_status(recResponseEntity.getBody().get("status"));
 
             // POST REQUEST TO SEARCH
@@ -246,7 +259,21 @@ public class SagaController {
             HttpEntity<HashMap<String, Object>> searchRequestEntity = new HttpEntity<>(data, authHeaders);
             ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.POST, searchRequestEntity, HashMap.class);
 
-            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(search, new ArrayList<>(Arrays.asList((String) searchResponseEntity.getBody().get("transaction_id"))));
+            check_status(searchResponseEntity.getBody().get("status"));
+
+            // POST REQUEST TO RECOMMEND ABOUT DOCUMENT
+
+            recUrl = search.getUri().toString().replace("http://", "https://") + "/job/";
+
+            recRequestEntity = new HttpEntity<>(data, authHeaders);
+            recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
+
+            List<String> recTransactionsList = affectedServices.get(recommendation);
+
+            recTransactionsList.add((String) recResponseEntity.getBody().get("transaction_id"));
+
+            affectedServices.put(recommendation, recTransactionsList);
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -277,7 +304,7 @@ public class SagaController {
         if (!prefix.equals("job") && !prefix.equals("cv"))
             return new ResponseEntity<>("Unknown prefix, choose one of those: job, cv", HttpStatus.BAD_REQUEST);
 
-        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
@@ -314,7 +341,7 @@ public class SagaController {
             HttpEntity<HashMap> recRequestEntity = new HttpEntity<>(recRequestBody, authHeaders);
             ResponseEntity<HashMap> recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
 
-            affectedServices.put(recommendation, (String) recResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(recommendation, new ArrayList<>(Arrays.asList((String) recResponseEntity.getBody().get("transaction_id"))));
             check_status(recResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -334,7 +361,7 @@ public class SagaController {
     @DeleteMapping(value = "/delete_cv/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> delete_cv(@RequestHeader(value = "Authorization") String authHeader,
                                   @PathVariable("id") String id) {
-        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
@@ -353,7 +380,7 @@ public class SagaController {
             HttpEntity<String> cvRequestEntity = new HttpEntity<>(null, authHeaders);
             ResponseEntity<HashMap> cvResponseEntity = restTemplate.exchange(cvUrl, HttpMethod.DELETE, cvRequestEntity, HashMap.class);
 
-            affectedServices.put(cv, (String) cvResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(cv, new ArrayList<>(Arrays.asList(((String) cvResponseEntity.getBody().get("transaction_id")))));
             check_status(cvResponseEntity.getBody().get("status"));
 
             // GET REQUEST TO SEARCH
@@ -364,7 +391,7 @@ public class SagaController {
             HttpEntity<String> searchRequestEntity = new HttpEntity<>(null, authHeaders);
             ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.DELETE, searchRequestEntity, HashMap.class);
 
-            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(search, new ArrayList<>(Arrays.asList((String) searchResponseEntity.getBody().get("transaction_id"))));
             check_status(cvResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -390,7 +417,7 @@ public class SagaController {
     @DeleteMapping(value = "/delete_job/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> delete_job(@RequestHeader(value = "Authorization") String authHeader,
                                   @PathVariable("id") String id) {
-        HashMap<ServiceInstance, String> affectedServices = new HashMap<>();
+        HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
@@ -409,7 +436,7 @@ public class SagaController {
             HttpEntity<String> cvRequestEntity = new HttpEntity<>(null, authHeaders);
             ResponseEntity<HashMap> cvResponseEntity = restTemplate.exchange(jobUrl, HttpMethod.DELETE, cvRequestEntity, HashMap.class);
 
-            affectedServices.put(job, (String) cvResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(job, new ArrayList<>(Arrays.asList((String) cvResponseEntity.getBody().get("transaction_id"))));
             check_status(cvResponseEntity.getBody().get("status"));
 
             // GET REQUEST TO SEARCH
@@ -420,7 +447,7 @@ public class SagaController {
             HttpEntity<String> searchRequestEntity = new HttpEntity<>(null, authHeaders);
             ResponseEntity<HashMap> searchResponseEntity = restTemplate.exchange(searchUrl, HttpMethod.DELETE, searchRequestEntity, HashMap.class);
 
-            affectedServices.put(search, (String) searchResponseEntity.getBody().get("transaction_id"));
+            affectedServices.put(search, new ArrayList<>(Arrays.asList((String) searchResponseEntity.getBody().get("transaction_id"))));
             check_status(cvResponseEntity.getBody().get("status"));
 
             final_changes(affectedServices, true);
@@ -443,20 +470,22 @@ public class SagaController {
         }
     }
 
-    private void final_changes(HashMap<ServiceInstance, String> affectedServices, Boolean commit) {
+    private void final_changes(HashMap<ServiceInstance, List<String>> affectedServices, Boolean commit) {
 
         String action = (commit) ? "/success/" : "/rollback/";
 
-        affectedServices.forEach( (service, transaction) -> {
-            HashMap<String, String> request = new HashMap<>();
-            request.put("id", transaction);
+        affectedServices.forEach( (service, transactions) ->
+            transactions.forEach( (transaction) -> {
+                HashMap<String, String> request = new HashMap<>();
+                request.put("id", transaction);
 
-            restTemplate.exchange(
-                    service.getUri().toString().replace("http://", "https://") + action,
-                    HttpMethod.POST,
-                    new HttpEntity<>(request, securityConfig.getHeaders()),
-                    String.class);
-        } );
+                restTemplate.exchange(
+                        service.getUri().toString().replace("http://", "https://") + action,
+                        HttpMethod.POST,
+                        new HttpEntity<>(request, securityConfig.getHeaders()),
+                        String.class);
+            } )
+        );
     }
 
     private void check_status(Object status) throws Exception {
