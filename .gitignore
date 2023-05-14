@@ -162,4 +162,4 @@ secrets/
 # Files and etc.
 mongo/mongodb/**
 
-elasticsearch/certs/**
+elasticsearch/data/**

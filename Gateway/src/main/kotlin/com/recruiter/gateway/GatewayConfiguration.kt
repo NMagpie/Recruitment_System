@@ -16,8 +16,13 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.reactive.CorsConfigurationSource
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
+import java.util.*
+
 
 @Configuration
 @EnableWebFluxSecurity
@@ -199,6 +204,17 @@ class GatewayConfiguration {
             .build()
     }
 
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = listOf("*")
+        configuration.allowedMethods = listOf("GET", "POST", "OPTIONS")
+        configuration.allowedHeaders = listOf("Authorization", "Content-Type")
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
+    }
+
     fun defaultFilter(f: GatewayFilterSpec, auth: Boolean): GatewayFilterSpec {
         if (auth)
             f.filter(jwtGatewayFilter)
@@ -210,7 +226,7 @@ class GatewayConfiguration {
 
     @Bean
     fun configure(http: ServerHttpSecurity): SecurityWebFilterChain {
-        http.csrf().disable().cors().disable()
+        http.csrf().disable()//.cors().disable()
 
         return http.build()
     }
