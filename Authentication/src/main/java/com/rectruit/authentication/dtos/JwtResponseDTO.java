@@ -20,12 +20,17 @@ public class JwtResponseDTO {
 
     @Getter
     @Setter
+    private String userType;
+
+    @Getter
+    @Setter
     private List<String> roles;
 
-    public JwtResponseDTO(String token, String userId, String username, List<String> roles) {
+    public JwtResponseDTO(String token, String userId, String username, String userType, List<String> roles) {
         this.token = token;
         this.userId = userId;
         this.username = username;
+        this.userType = userType;
         this.roles = roles;
     }
 }

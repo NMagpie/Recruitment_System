@@ -70,7 +70,7 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(new JwtResponseDTO(jwt, user.get_id().toString(), userDetails.getUsername(), roles));
+            return ResponseEntity.ok(new JwtResponseDTO(jwt, user.get_id().toString(), userDetails.getUsername(), user.getUserType(), roles));
         }
         return ResponseEntity.badRequest().body("No such user!");
     }
@@ -106,6 +106,7 @@ public class AuthController {
 
         return ResponseEntity.ok("{\n\"status\": \"success\"," +
                 "\n\"transaction_id\": \""+ transaction_id +"\"," +
+                "\n\"user_type\": \""+ user.getUserType() +"\"," +
                 "\n\"user_id\": \""+ document_id +"\"," +
                 "\n\"token\": \""+ jwt +"\"\n}");
     }

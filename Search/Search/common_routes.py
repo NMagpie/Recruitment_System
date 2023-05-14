@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from elasticsearch_dsl import Q, IllegalOperation
@@ -23,9 +25,9 @@ def health():
 def search_data(request, search_type):
     if request.method == 'GET':
 
-        if search_type == 'cv':
+        if search_type == 'cvs':
             document = CVMetadataDocument
-        elif search_type == 'job':
+        elif search_type == 'jobs':
             document = JobDocument
 
         try:
@@ -47,15 +49,12 @@ def search_data(request, search_type):
             search_results = document.search() \
                 .query(Q('bool', should=should_clause)) \
                 .sort('_score') \
+                .source(excludes=['tags']) \
                 .extra(size=10, from_=10 * offset)
 
-            count = search_results.count(),
-            results = [
-                {
-                    key: value for key, value in result.items() if key != 'tags'
-                }
-                for result in search_results
-            ]
+            count = search_results.count()
+
+            results = [result.to_dict() for result in search_results]
 
         except IllegalOperation:
             return JsonResponse({'status': 'error', 'message': 'invalid search query'}, status=400)

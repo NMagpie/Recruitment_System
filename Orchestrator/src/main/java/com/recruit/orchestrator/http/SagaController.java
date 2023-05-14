@@ -264,7 +264,7 @@ public class SagaController {
 
             // POST REQUEST TO RECOMMEND ABOUT DOCUMENT
 
-            recUrl = search.getUri().toString().replace("http://", "https://") + "/job/";
+            recUrl = recommendation.getUri().toString().replace("http://", "https://") + "/job/";
 
             recRequestEntity = new HttpEntity<>(data, authHeaders);
             recResponseEntity = restTemplate.exchange(recUrl, HttpMethod.POST, recRequestEntity, HashMap.class);
@@ -301,8 +301,8 @@ public class SagaController {
                                @RequestParam("q") List<String> queries,
                                @RequestParam("offset") long offset,
                                @PathVariable("prefix") String prefix) {
-        if (!prefix.equals("job") && !prefix.equals("cv"))
-            return new ResponseEntity<>("Unknown prefix, choose one of those: job, cv", HttpStatus.BAD_REQUEST);
+        if (!prefix.equals("jobs") && !prefix.equals("cvs"))
+            return new ResponseEntity<>("Unknown prefix, choose one of those: jobs, cvs", HttpStatus.BAD_REQUEST);
 
         HashMap<ServiceInstance, List<String>> affectedServices = new HashMap<>();
 

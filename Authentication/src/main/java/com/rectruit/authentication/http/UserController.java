@@ -58,6 +58,7 @@ public class UserController {
                 jwt,
                 id,
                 userDetails.getUsername(),
+                null,
                 userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList())

@@ -31,8 +31,8 @@ urlpatterns = [
     path('cv/', CV_View.as_view(), name='cv_view'),
     path('job/', Job_View.as_view(), name='job_view'),
 
-    path('search/job/', search_data, name='search_job', kwargs={'search_type': 'job'}),
-    path('search/cv/', search_data, name='search_cv_metadata', kwargs={'search_type': 'cv'}),
+    path('search/jobs/', search_data, name='search_job', kwargs={'search_type': 'jobs'}),
+    path('search/cvs/', search_data, name='search_cv_metadata', kwargs={'search_type': 'cvs'}),
 
     path('health', health, name='health'),
 
