@@ -1,0 +1,31 @@
+.cv-item {
+    border: 1px solid #ddd;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .cv-filename {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+  
+  .cv-filetype,
+  .candidate-name {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .download-btn {
+    display: inline-block;
+    background-color: #327aaa;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .download-btn:hover {
+    background-color: #276086;
+  }
+  
