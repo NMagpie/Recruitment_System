@@ -163,3 +163,25 @@ secrets/
 mongo/mongodb/**
 
 elasticsearch/data/**
+
+# node dependencies
+Client/node_modules
+Client/.pnp
+Client/.pnp.js
+
+# node testing
+Client/coverage
+
+# node production
+Client/build
+
+# misc node
+Client/.DS_Store
+Client/.env.local
+Client/.env.development.local
+Client/.env.test.local
+Client/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
