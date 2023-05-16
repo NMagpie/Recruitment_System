@@ -8,6 +8,7 @@ import { set_user_session } from "../Redux/userSlice";
 const RegistrationPage = ({ handleCloseRegister }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [userType, setUserType] = useState("user");
   const [location, setLocation] = useState("");
   const [error, setError] = useState('');
@@ -21,17 +22,19 @@ const RegistrationPage = ({ handleCloseRegister }) => {
       const response = await axios.post(
         `http://${apiHost}:${apiPort}/register`,
         {
-          username,
-          password,
-          userType,
+          username: username,
+          name: name,
+          password: password,
+          userType: userType,
           roles: ["USER"],
-          location,
+          location: location,
         }
       );
 
       dispatch(set_user_session({
         jwtToken: response.data.jwt,
         userId: response.data.user_id,
+        name: name,
         userType: userType,
         username: username
       }));
@@ -65,6 +68,17 @@ return (
         onChange={(event) => setPassword(event.target.value)}
       />
     </div>
+
+    <div className="form-group">
+      <label htmlFor="username">Name / Company Name:</label>
+      <input
+        type="text"
+        id="name"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
+    </div>
+
     <div className="form-group">
       <label htmlFor="user-type">User type:</label>
       <select

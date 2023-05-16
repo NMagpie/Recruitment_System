@@ -24,6 +24,7 @@ function Login({ handleCloseLogin }) {
       dispatch(set_user_session({
         jwtToken: response.data.token,
         userId: response.data.userId,
+        name: response.data.name,
         userType: response.data.userType,
         username: response.data.username
       }));

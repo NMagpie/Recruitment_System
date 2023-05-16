@@ -19,7 +19,7 @@ import socket
 import schedule
 from django.contrib import admin
 from django.urls import path, include
-from .routes import upload_job, rud_job, health
+from .routes import upload_job, rud_job, health, get_user_jobs
 from .saga_pattern.saga_routes import get_saga_urls
 from .serviceJWTAuthentication import refresh_token, schedule_loop, initialize_token
 import py_eureka_client.eureka_client as eureka_client
@@ -29,6 +29,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('jobs/', upload_job, name='upload_job'),
     path('jobs/<str:id>', rud_job, name='rud_job'),
+
+    path('user/job/<str:userId>', get_user_jobs, name='get_user_jobs'),
 
     path('health', health, name='health'),
 

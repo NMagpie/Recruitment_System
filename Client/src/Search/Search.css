@@ -4,7 +4,7 @@
   align-content: center;
   align-items: center;
   height: calc(100vh - 100px);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .results {
@@ -13,6 +13,11 @@
   justify-content: flex-start;
   align-items: center;
   align-content: center;
+  align-items: center;
+}
+
+.user-name-text {
+  display: flex;
   align-items: center;
 }
 
@@ -28,17 +33,16 @@
   border-radius: 5px;
   border: none;
   font-size: 16px;
-  background-color: #2e6f9a;
+  background-color: #327aaa;
   width: fit-content;
-  color: black;
+  color: white;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .entry-button:hover {
-  background-color: #3d95d0;
+  background-color: #276086;
 }
-
 
 .messages {
   display: flex;

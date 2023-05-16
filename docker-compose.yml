@@ -35,8 +35,6 @@ services:
 
     volumes:
       - ./elasticsearch/data:/elasticsearch/data:rw
-      #- ./elasticsearch/elasticsearch.yml:/opt/bitnami/elasticsearch/config/elasticsearch.yml
-      #- ./elasticsearch/certs:/opt/bitnami/elasticsearch/config/certs:rw
 
   gateway:
     container_name: gateway

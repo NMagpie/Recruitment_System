@@ -7,7 +7,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 
 function Job() {
     const [isLoading, setIsLoading] = useState(false)
-    const [cv, setCV] = useState({})
+    const [job, setJob] = useState({})
 
     const navigate = useNavigate()
 
@@ -18,6 +18,7 @@ function Job() {
     const isLoggedIn = (userContext) => {
         return userContext.jwtToken
         && userContext.userId
+        && userContext.name
         && userContext.userType
         && userContext.username;
     }
@@ -32,7 +33,7 @@ function Job() {
                 const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${userContext.jwtToken}` }
                 });
-                setCV(response.data);
+                setJob(response.data);
             } catch (error) {
                 console.error(error);
             }
@@ -53,9 +54,9 @@ function Job() {
                 </div>
                 <button onClick={goBack} className="download-btn">Back</button>
                 <div className="job-item">
-                    <h3 className="job-title">Title: {cv.title}</h3>
-                    <p className="job-location">Location: {cv.location}</p>
-                    <p className="job-description">Description: {cv.description}</p>
+                    <h3 className="job-title">Title: {job.title}</h3>
+                    <p className="job-location">Location: {job.location}</p>
+                    <p className="job-description">Description: {job.description}</p>
                 </div>
             </div>) : (
             <div>

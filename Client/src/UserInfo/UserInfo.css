@@ -1,0 +1,48 @@
+.user-item {
+    border: 1px solid #ddd;
+    padding: 16px;
+    background-color: #ddd;
+    border-radius: 10px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+.document-list {
+  overflow-y: auto;
+  max-height: 70%;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-title {
+  font-size: 24px;
+}
+
+.user-location,
+.user-description {
+  font-size: 16px;
+}
+
+.entry {
+  width: 50vw;
+  margin: 10px 10px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: #3d95d0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.entry-button {
+  border-radius: 5px;
+  border: none;
+  font-size: 16px;
+  background-color: #2e6f9a;
+  width: fit-content;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}

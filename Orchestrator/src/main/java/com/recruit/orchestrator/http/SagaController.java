@@ -231,12 +231,12 @@ public class SagaController {
             HttpEntity<Map<String, Object>> jobRequestEntity = new HttpEntity<>(job, authHeaders);
             ResponseEntity<String> jobResponseEntity = restTemplate.exchange(jobUrl, HttpMethod.POST, jobRequestEntity, String.class);
 
-            Map<String, Object> cvResponseMap = objectMapper.readValue(jobResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
+            Map<String, Object> jobResponseMap = objectMapper.readValue(jobResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
 
-            affectedServices.put(jobPosting, new ArrayList<>(Arrays.asList((String) cvResponseMap.get("transaction_id"))));
-            check_status(cvResponseMap.get("status"));
+            affectedServices.put(jobPosting, new ArrayList<>(Arrays.asList((String) jobResponseMap.get("transaction_id"))));
+            check_status(jobResponseMap.get("status"));
 
-            HashMap<String, Object> data = (HashMap) cvResponseMap.get("data");
+            HashMap<String, Object> data = (HashMap) jobResponseMap.get("data");
 
             // POST REQUEST TO RECOMMEND ABOUT USER
 

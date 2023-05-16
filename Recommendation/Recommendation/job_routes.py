@@ -27,6 +27,7 @@ class Job_View(View):
 
                 _id = data.get('_id')
                 user_id = data.get('user_id')
+                company_name = data.get('company_name')
                 title = data.get('title')
                 description = data.get('description')
                 location = data.get('location')
@@ -37,6 +38,7 @@ class Job_View(View):
 
                 if not _id or \
                         not user_id or \
+                        not company_name or \
                         not title or \
                         not description or \
                         not location or \
@@ -46,6 +48,7 @@ class Job_View(View):
                 job = Job(
                     _id=ObjectId(_id),
                     user_id=user_id,
+                    company_name=company_name,
                     title=title,
                     description=description,
                     location=location,

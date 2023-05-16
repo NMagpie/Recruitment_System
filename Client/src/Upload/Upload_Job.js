@@ -17,7 +17,11 @@ const UploadJob = () => {
   const userContext = useSelector((state) => state.userContext)
 
   const isLoggedIn = (userContext) => {
-    return userContext.jwtToken && userContext.userId && userContext.userType && userContext.username;
+    return userContext.jwtToken 
+    && userContext.userId 
+    && userContext.name
+    && userContext.userType 
+    && userContext.username;
   }
 
   const navigate = useNavigate()
@@ -44,6 +48,7 @@ const UploadJob = () => {
           `http://${apiHost}:${apiPort}/upload_job`,
           JSON.stringify({
             user_id: userContext.userId,
+            company_name: userContext.name,
             title,
             description,
             location

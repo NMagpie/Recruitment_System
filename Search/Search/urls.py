@@ -20,6 +20,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from Search.common_routes import search_data, health
+from Search.documents import create_indexes
 from Search.saga_pattern.saga_routes import get_saga_urls
 from Search.cv_routes import CV_View
 from Search.job_routes import Job_View
@@ -40,3 +41,5 @@ urlpatterns = [
 ]
 
 initialize_token()
+
+create_indexes()

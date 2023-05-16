@@ -4,6 +4,8 @@ import { apiHost, apiPort } from "../App";
 import axios from "axios";
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import './Search.css';
+import UserInfo from '../UserInfo/UserInfo';
+import Modal from 'react-bootstrap/Modal';
 
 
 function Search() {
@@ -12,6 +14,15 @@ function Search() {
     const [zeroResults, setZeroResults] = useState(false)
     const [offset, setOffset] = useState(0)
     const { query } = useParams()
+
+    const [showUser, setShowUser] = useState(false);
+    const [userId, setUserId] = useState('');
+
+    const handleShowUser = (userId) => {
+        setUserId(userId)
+        setShowUser(true)
+    };
+    const handleCloseUser = () => setShowUser(false);
 
     // const handleScroll = async (e) => {
 
@@ -51,7 +62,11 @@ function Search() {
     const userContext = useSelector((state) => state.userContext)
 
     const isLoggedIn = (userContext) => {
-        return userContext.jwtToken && userContext.userId && userContext.userType && userContext.username;
+        return userContext.jwtToken 
+        && userContext.userId 
+        && userContext.name
+        && userContext.userType 
+        && userContext.username;
     }
 
     const navigate = useNavigate()
@@ -60,37 +75,35 @@ function Search() {
 
     const handleSearch = async () => {
 
-    setOffset(0);
+        setOffset(0);
 
-    setSearchResults([]);
+        setSearchResults([]);
 
-    setZeroResults(false);
+        setZeroResults(false);
 
-    setIsLoading(true);
+        setIsLoading(true);
 
-    const documentType = userContext.userType === 'company' ? 'cvs' : 'jobs';
+        const documentType = userContext.userType === 'company' ? 'cvs' : 'jobs';
 
-    const url = `http://${apiHost}:${apiPort}/search/${documentType}/?${query}offset=${offset}`;
+        const url = `http://${apiHost}:${apiPort}/search/${documentType}/?${query}offset=${offset}`;
 
-        try {
-            const response = await axios.get(url, {
-            headers: { Authorization: `Bearer ${userContext.jwtToken}` }
-            });
-            setSearchResults(response.data.results);
+            try {
+                const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${userContext.jwtToken}` }
+                });
+                setSearchResults(response.data.results);
 
-            if (response.data.results.length == 0)
-                setZeroResults(true);
-        } catch (error) {
-            console.error(error);
-            setSearchResults([]);
-        }
+                if (response.data.results.length == 0)
+                    setZeroResults(true);
+            } catch (error) {
+                console.error(error);
+                setSearchResults([]);
+            }
 
-    setIsLoading(false);
+        setIsLoading(false);
     };
 
     useEffect(() => {handleSearch();}, [query]);
-
-    console.log(searchResults)
 
     return(
         <div>
@@ -112,7 +125,7 @@ function Search() {
                     return(
                         <div key={result.db_id} className='entry'>
                         <Link to={`/cv/${result.db_id}`}><button className='entry-button'><h3>{result.filename}</h3></button></Link>
-                        <p>Name: {result.candidate_name}</p>
+                        <p className='user-name-text'>Name: <button onClick={() => handleShowUser(result.user_id)}>{result.candidate_name}</button></p>
                         <p>Filetype: {result.filetype}</p>
                         </div>
                     )}
@@ -123,12 +136,22 @@ function Search() {
                         return(
                             <div key={result.db_id} className='entry'>
                             <Link to={`/job/${result.db_id}`}><button className='entry-button'><h3>{result.title}</h3></button></Link>
+                            <p className='user-name-text'>Company Name: <button onClick={() => handleShowUser(result.user_id)}>{result.company_name}</button></p>
                             <p>Location: {result.location}</p>
                             </div>
                         )}
                     )}
 
-                {offset > 0 && isLoading && <h2>Loading...</h2>}
+                {/* {offset > 0 && isLoading && <h2>Loading...</h2>} */}
+
+                <Modal show={showUser} onHide={handleCloseUser} backdrop="static">
+                    <Modal.Body>
+                    <div className="overlay" onClick={handleCloseUser}></div>
+                    <div className="modal-content">
+                        <UserInfo handleCloseUser={handleCloseUser} userId={userId}/>
+                    </div>
+                    </Modal.Body>
+                </Modal>
 
             </div>
         </div>) : (

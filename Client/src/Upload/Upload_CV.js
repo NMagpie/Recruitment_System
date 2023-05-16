@@ -16,7 +16,11 @@ const UploadCV = () => {
   const userContext = useSelector((state) => state.userContext)
 
   const isLoggedIn = (userContext) => {
-    return userContext.jwtToken && userContext.userId && userContext.userType && userContext.username;
+    return userContext.jwtToken 
+    && userContext.userId 
+    && userContext.name
+    && userContext.userType 
+    && userContext.username;
   }
 
   const navigate = useNavigate()
@@ -34,14 +38,14 @@ const UploadCV = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!file || !candidateName) {
-      setError("Please fill out all fields.");
+    if (!file) {
+      setError("Please upload file before submitting.");
       return;
     }
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("candidate_name", candidateName);
+    formData.append("candidate_name", userContext.name);
     formData.append("user_id", userContext.userId);
 
     try {
@@ -78,7 +82,7 @@ const UploadCV = () => {
             <input type="file" id="file" onChange={handleFileChange} />
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="candidateName">Candidate Name</label>
             <input
               type="text"
@@ -86,7 +90,7 @@ const UploadCV = () => {
               value={candidateName}
               onChange={handleCandidateNameChange}
             />
-          </div>
+          </div> */}
 
           <button type="submit" className="submit-button">Upload</button>
           {error && <div>{error}</div>}

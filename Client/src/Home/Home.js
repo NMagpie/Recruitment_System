@@ -9,13 +9,18 @@ import Modal from 'react-bootstrap/Modal';
 import Login from "../Login/Login";
 import RegistrationPage from "../Register/Register";
 import RecEntry from "../Recommendation/RecEntry";
+import UserInfo from '../UserInfo/UserInfo';
 
 export default function Home() {
 
     const userContext = useSelector((state) => state.userContext)
   
     const isLoggedIn = (userContext) => {
-      return userContext.jwtToken && userContext.userId && userContext.userType && userContext.username;
+      return userContext.jwtToken 
+      && userContext.userId
+      && userContext.name
+      && userContext.userType 
+      && userContext.username;
     }
 
     const [showLogin, setShowLogin] = useState(false);
@@ -69,7 +74,18 @@ function LoggedInHome() {
   const [isLoading, setIsLoading] = useState(false)
   const [recommendations, setRecommendations] = useState([])
 
+  const [showUser, setShowUser] = useState(false);
+  const [userId, setUserId] = useState('');
+
+  const handleShowUser = (userId) => {
+      setUserId(userId)
+      setShowUser(true)
+  };
+  const handleCloseUser = () => setShowUser(false);
+
   const getRecommendations = async () => {
+
+    setRecommendations([]);
 
     setIsLoading(true);
 
@@ -80,9 +96,6 @@ function LoggedInHome() {
             headers: { Authorization: `Bearer ${userContext.jwtToken}` }
             });
             setRecommendations(response.data.recommendations);
-
-            // if (response.data.results.length == 0)
-            //     setZeroResults(true);
         } catch (error) {
             console.error(error);
             setRecommendations([]);
@@ -97,12 +110,12 @@ function LoggedInHome() {
 
   const recommendList = recommendations.map( 
     entry => { return(
-      <RecEntry entry={entry} entryType={entryType} />
+      <RecEntry entry={entry} entryType={entryType} handleShowUser={handleShowUser} />
   ) } )
 
   return(
       <div className="logged-home">
-        <h1>Welcome, {userContext.username}!</h1>
+        <h1>Welcome, {userContext.userType === 'company' ? userContext.name : userContext.name.split(' ')[1] ? userContext.name.split(' ')[1] : userContext.name}!</h1>
 
         {userContext.userType === 'company' && <Link to="/upload_job"><button>Upload Job</button></Link>}
         {userContext.userType === 'user' && <Link to="/upload_cv"><button>Upload CV</button></Link>}
@@ -110,11 +123,26 @@ function LoggedInHome() {
         {isLoading ? (
           <></>
         ) : (
-          <div className="recommendations">
-            <h2>Some recommendations for you:</h2>
-            <div className="recommend-list">
-            {recommendList}
+          <div>
+            {recommendations.length > 0 ? (
+            <div className="recommendations">
+              <h2>Some recommendations for you:</h2>
+              <div className="recommend-list">
+                {recommendList}
+              </div>
             </div>
+            ) : (
+              <></>
+            )}
+
+            <Modal show={showUser} onHide={handleCloseUser} backdrop="static">
+                <Modal.Body>
+                <div className="overlay" onClick={handleCloseUser}/>
+                <div className="modal-content">
+                    <UserInfo handleCloseUser={handleCloseUser} userId={userId}/>
+                </div>
+                </Modal.Body>
+            </Modal>
           </div>
         )}
       </div>

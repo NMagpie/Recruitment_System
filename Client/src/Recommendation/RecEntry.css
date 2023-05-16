@@ -10,13 +10,16 @@
   }
 
 .rec-entry-button {
-  width: fit-content;
   border-radius: 5px;
   border: none;
   font-size: 16px;
-  background-color: #2e6f9a;
+  background-color: #327aaa;
   width: fit-content;
-  color: black;
+  color: white;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+.rec-entry-button:hover {
+  background-color: #276086;
 }

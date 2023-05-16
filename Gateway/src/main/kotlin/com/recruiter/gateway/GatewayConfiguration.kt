@@ -59,6 +59,29 @@ class GatewayConfiguration {
     fun gatewayRoutes(builder: RouteLocatorBuilder): RouteLocator {
 
         return builder.routes()
+
+            // USER ENTRIES RETRIEVE
+
+            .route { r ->
+                r.path("/user/cv/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://CV-PROCESSING")
+            }
+
+            .route { r ->
+                r.path("/user/job/**")
+                    .and()
+                    .method(HttpMethod.GET)
+                    .filters { f ->
+                        defaultFilter(f, true)
+                    }
+                    .uri("lb://JOB-POSTING")
+            }
+
             // AUTHENTICATION ROUTES
             .route { r ->
                 r.path("/login")

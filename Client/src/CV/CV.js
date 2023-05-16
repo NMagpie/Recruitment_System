@@ -18,6 +18,7 @@ function CV() {
     const isLoggedIn = (userContext) => {
         return userContext.jwtToken
         && userContext.userId
+        && userContext.name
         && userContext.userType
         && userContext.username;
     }
