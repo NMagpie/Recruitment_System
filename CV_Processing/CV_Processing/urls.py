@@ -19,7 +19,7 @@ import schedule
 from django.contrib import admin
 from django.urls import path, include
 
-from .routes import upload_cv, cv_details, cv_download, delete_cv, health
+from .routes import upload_cv, cv_details, cv_download, delete_cv, health, get_user_cvs
 from .saga_pattern.saga_routes import get_saga_urls
 from .serviceJWTAuthentication import refresh_token, schedule_loop, initialize_token
 import py_eureka_client.eureka_client as eureka_client
@@ -31,6 +31,9 @@ urlpatterns = [
     path('cv/delete/<str:id>', delete_cv, name='delete_cv'),
     path('cv/info/<str:id>', cv_details, name='cv_details'),
     path('cv/download/<str:id>', cv_download, name='cv_download'),
+
+    path('user/cv/<str:userId>', get_user_cvs, name='get_user_cvs'),
+
     path('health', health, name='health'),
 
     path('', include(get_saga_urls()))

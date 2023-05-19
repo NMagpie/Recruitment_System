@@ -66,7 +66,7 @@ def upload_cv(request):
         keywords = set()
         for token in doc:
             if not token.is_stop and token.is_alpha and token.pos_ in ['NOUN', 'PROPN']:
-                keywords.add(token.text)
+                keywords.add(token.text.lower())
 
         metadata = FileMetadata(_id=cv_file_hash,
                                 filename=cv_updated_name,
@@ -139,9 +139,6 @@ def cv_details(request, id):
 @permission_classes([IsAuthenticated])
 @csrf_exempt
 def cv_download(request, id):
-    if '../' in id:
-        return JsonResponse({'error': 'Invalid file path'}, status=400)
-
     try:
 
         metadata = FileMetadata.objects.get(_id=ObjectId(id))
@@ -153,6 +150,28 @@ def cv_download(request, id):
         return response
     except FileMetadata.DoesNotExist:
         return JsonResponse({'error': 'CV file does not exist'}, status=404)
+
+
+@api_view(['GET'])
+@authentication_classes([
+    AuthorizationJWTAuthentication,
+    ServiceAuthJWTAuthentication])
+@permission_classes([IsAuthenticated])
+@csrf_exempt
+def get_user_cvs(request, userId):
+    try:
+        cv_files = FileMetadata.objects.filter(user_id=userId)
+
+        response = [{
+            '_id': str(cv_file._id),
+            'filename': cv_file.filename,
+            'filetype': cv_file.filetype,
+            'candidate_name': cv_file.candidate_name,
+            'user_id': cv_file.user_id
+        } for cv_file in cv_files]
+        return JsonResponse({'documents': response}, status=200)
+    except FileMetadata.DoesNotExist:
+        return JsonResponse({'documents': []}, status=200)
 
 
 def extract_text_from_pdf(file):

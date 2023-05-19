@@ -53,6 +53,9 @@ public class SagaController {
             ServiceInstance authentication = loadBalancer.choose("AUTHENTICATION");
             ServiceInstance recommendation = loadBalancer.choose("RECOMMENDATION");
 
+            if (authentication == null || recommendation == null)
+                throw new Exception("Oops! Something went wrong... Try again next time.");
+
             // POST REQUEST TO AUTH
 
             String authUrl = authentication.getUri().toString().replace("http://", "https://") + "/auth/register";
@@ -97,12 +100,12 @@ public class SagaController {
 
             return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -120,6 +123,9 @@ public class SagaController {
             ServiceInstance cvProcessing = loadBalancer.choose("CV-PROCESSING");
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance recommendation = loadBalancer.choose("RECOMMENDATION");
+
+            if (cvProcessing == null || recommendation == null || search == null)
+                throw new Exception("Oops! Something went wrong... Try again next time.");
 
             // POST REQUEST TO CV-PROCESSING
 
@@ -196,13 +202,13 @@ public class SagaController {
 
             return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
             e.printStackTrace();
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -219,6 +225,9 @@ public class SagaController {
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance recommendation = loadBalancer.choose("RECOMMENDATION");
 
+            if (jobPosting == null || recommendation == null || search == null)
+                throw new Exception("Oops! Something went wrong... Try again next time.");
+
             // POST REQUEST TO JOB-POSTING
 
             String jobUrl = jobPosting.getUri().toString().replace("http://", "https://") + "/jobs/";
@@ -231,12 +240,12 @@ public class SagaController {
             HttpEntity<Map<String, Object>> jobRequestEntity = new HttpEntity<>(job, authHeaders);
             ResponseEntity<String> jobResponseEntity = restTemplate.exchange(jobUrl, HttpMethod.POST, jobRequestEntity, String.class);
 
-            Map<String, Object> cvResponseMap = objectMapper.readValue(jobResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
+            Map<String, Object> jobResponseMap = objectMapper.readValue(jobResponseEntity.getBody(), new TypeReference<HashMap<String, Object>>() {});
 
-            affectedServices.put(jobPosting, new ArrayList<>(Arrays.asList((String) cvResponseMap.get("transaction_id"))));
-            check_status(cvResponseMap.get("status"));
+            affectedServices.put(jobPosting, new ArrayList<>(Arrays.asList((String) jobResponseMap.get("transaction_id"))));
+            check_status(jobResponseMap.get("status"));
 
-            HashMap<String, Object> data = (HashMap) cvResponseMap.get("data");
+            HashMap<String, Object> data = (HashMap) jobResponseMap.get("data");
 
             // POST REQUEST TO RECOMMEND ABOUT USER
 
@@ -285,12 +294,12 @@ public class SagaController {
 
             return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -309,6 +318,9 @@ public class SagaController {
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance recommendation = loadBalancer.choose("RECOMMENDATION");
+
+            if (search == null || recommendation == null)
+                throw new Exception("Oops! Something went wrong... Try again next time.");
 
             // GET REQUEST TO SEARCH
 
@@ -347,12 +359,12 @@ public class SagaController {
             final_changes(affectedServices, true);
             return new ResponseEntity<>(searchResponseEntity.getBody(), HttpStatus.OK);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -366,6 +378,9 @@ public class SagaController {
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance cv = loadBalancer.choose("CV-PROCESSING");
+
+            if (search == null || cv == null)
+                throw new Exception("Oops! Something went wrong... Try again next time.");
 
             // GET REQUEST TO CV-PROCESSING
 
@@ -403,12 +418,12 @@ public class SagaController {
 
             return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -422,6 +437,9 @@ public class SagaController {
         try {
             ServiceInstance search = loadBalancer.choose("SEARCH");
             ServiceInstance job = loadBalancer.choose("JOB-POSTING");
+
+            if (search == null || job == null)
+                throw new Exception("Oops! Something went wrong... Try again next time.");
 
             // GET REQUEST TO JOB-POSTING
 
@@ -459,12 +477,12 @@ public class SagaController {
 
             return new ResponseEntity<>(objectMapper.writeValueAsString(response), HttpStatus.OK);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             HttpStatusCode status = e.getStatusCode();
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatusCode.valueOf(status.value()));
         } catch (Exception e) {
-            String errorResponse = e.getMessage();
+            String errorResponse = "Oops! Something went wrong... Try again next time.";
             final_changes(affectedServices, false);
             return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
         }

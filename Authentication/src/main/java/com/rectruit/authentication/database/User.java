@@ -27,6 +27,10 @@ public class User {
 
     @Getter
     @Setter
+    private String name;
+
+    @Getter
+    @Setter
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 

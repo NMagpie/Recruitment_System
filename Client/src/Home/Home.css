@@ -1,0 +1,78 @@
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 100px);
+}
+
+.logged-home {
+  height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+button {
+  padding: 12px 24px;
+  border-radius: 5px;
+  border: none;
+  font-size: 20px;
+  background-color: #327aaa;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 150px;
+  margin: 10px;
+}
+
+button:hover {
+  background-color: #276086;
+}
+
+.overlay {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.modal-content {
+  position: fixed;
+  display: flex;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(3px);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recommend-list {
+  display: flex;
+  width: 70vw;
+  overflow-y: auto;
+  justify-content: space-between;
+}
+
+.recommendations {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

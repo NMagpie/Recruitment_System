@@ -70,7 +70,7 @@ public class AuthController {
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(new JwtResponseDTO(jwt, user.get_id().toString(), userDetails.getUsername(), user.getUserType(), roles));
+            return ResponseEntity.ok(new JwtResponseDTO(jwt, user.get_id().toString(), userDetails.getUsername(), user.getName(), user.getUserType(), roles));
         }
         return ResponseEntity.badRequest().body("No such user!");
     }

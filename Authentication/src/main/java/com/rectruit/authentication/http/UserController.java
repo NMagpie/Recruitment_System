@@ -59,6 +59,7 @@ public class UserController {
                 id,
                 userDetails.getUsername(),
                 null,
+                null,
                 userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList())

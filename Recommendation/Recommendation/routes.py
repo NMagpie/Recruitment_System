@@ -14,6 +14,7 @@ from django.db.models import Q
 from functools import reduce
 import operator
 
+
 @api_view(['GET'])
 @csrf_exempt
 def health():
@@ -46,7 +47,10 @@ def get_recommendations(request):
 
             queryset = UserData.objects.all()
 
-            users = queryset.filter(reduce(operator.or_, (Q(tags__icontains=tag) for tag in user_tags)))
+            if not user_tags:
+                users = []
+            else:
+                users = queryset.filter(reduce(operator.or_, (Q(tags__icontains=tag) for tag in user_tags)))
 
             ranked_users = sorted(users, key=lambda u: len(set(u.tags) & set(user_tags)), reverse=True)
             similar_users = ranked_users[:10]
@@ -65,13 +69,16 @@ def get_recommendations(request):
 
             queryset = document_type.objects.all()
 
-            documents = queryset.filter(reduce(operator.or_, (Q(tags__icontains=tag) for tag in recommendations)))
+            if not recommendations:
+                documents = []
+            else:
+                documents = queryset.filter(reduce(operator.or_, (Q(tags__icontains=tag) for tag in recommendations)))
 
             ranked_documents = sorted(documents, key=lambda d: len(set(d.tags) & set(recommendations)), reverse=True)
             recommended_documents = [
                 {
                     k: str(v) if k == '_id' else v for k,
-                    v in doc.__dict__.items() if k != 'tags' and k != '_state'
+                v in doc.__dict__.items() if k != 'tags' and k != '_state'
                 }
                 for doc in ranked_documents[:10]
             ]
@@ -119,7 +126,7 @@ def upload_user(request):
                 tags = userData.tags
                 searches = userData.searches
             else:
-                tags = []
+                tags = [tag.lower().strip() for tag in location.split(',')]
                 searches = []
 
             userData = UserData(
@@ -210,6 +217,8 @@ def upload_searches(request):
                 return JsonResponse({'status': 'error', 'message': 'required fields are missing'}, status=400)
 
             limit = 250 if userData.type == 'user' else 3000
+
+            searches = [search.lower().strip() for search in searches]
 
             searches = list(set(searches + userData.searches))[:limit]
 
