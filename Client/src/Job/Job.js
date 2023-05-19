@@ -56,7 +56,7 @@ function Job() {
                 <div className="job-item">
                     <h3 className="job-title">Title: {job.title}</h3>
                     <p className="job-location">Location: {job.location}</p>
-                    <p className="job-description">Description: {job.description}</p>
+                    <pre className="job-description">Description: {job.description}</pre>
                 </div>
             </div>) : (
             <div>
