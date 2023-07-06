@@ -6,6 +6,6 @@ Made by:
 * Sorochin Nichita
 
 Supervisor:
-Gavrilita Mihail, asist. univ.
+Gavrilita Mihail
 
 To run the project, you can use `Docker Compose`
