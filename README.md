@@ -7,3 +7,5 @@ Made by:
 
 Supervisor:
 Gavrilita Mihail, asist. univ.
+
+To run the project, you can use `Docker Compose`
