@@ -2,8 +2,8 @@
 Diploma Thesis Work of creation of Recruitment System
 
 Made by:
-* Birsan Andreea, FAF-193
-* Sorochin Nichita, FAF-191
+* Birsan Andreea
+* Sorochin Nichita
 
 Supervisor:
 Gavrilita Mihail, asist. univ.
