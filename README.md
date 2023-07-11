@@ -17,4 +17,4 @@ The project provides features of automatically derive words from the Employees' 
 
 The project itself consists of several microservices communicating using HTTP:
 
-![image](https://github.com/NMagpie/Recruitment_System/assets/6358475/381d0e1a-979c-40c6-92b5-c90689455f8a)
+![System Diagram](https://github.com/NMagpie/Recruitment_System/assets/6358475/60c881df-7b8f-4f63-a962-096da9eee0a6)
