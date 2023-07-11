@@ -1,0 +1,2149 @@
+{
+	"info": {
+		"_postman_id": "57f060f0-8a1f-4295-976d-ac269d5e7d90",
+		"name": "Recruitment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17762289",
+		"_collection_link": "https://solar-equinox-404630.postman.co/workspace/Diploma~89acdeca-5df0-401e-88db-fa4210af2202/collection/17762289-57f060f0-8a1f-4295-976d-ac269d5e7d90?action=share&creator=17762289&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "API Gateway",
+			"item": [
+				{
+					"name": "Routes",
+					"item": [
+						{
+							"name": "Authentication",
+							"item": [
+								{
+									"name": "Register",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRF-TOKEN",
+												"value": "f",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"test123\",\r\n    \"password\": \"lola444\",\r\n    \"userType\": \"company\",\r\n    \"roles\": [\"USER\"],\r\n    \"location\": \"aaabbb\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:8000/register",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8000",
+											"path": [
+												"register"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Login",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Service-Auth",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRiZjhlODFlYjFiZDMwY2Y0ODE2MjkiLCJpYXQiOjE2ODI3MDA1MjAsImV4cCI6MTY4MjcwNDEyMH0.utAciArGY8-BmhVqLx29gF3T7bQWsenY-atKw1gS7IKCfvAcSyfc-y2hxqSHTLgrg8MYKevFt2CgeI4bkHBJ4w",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"test123\",\r\n    \"password\": \"lola444\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:8000/login",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8000",
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Logout (Deprecated)",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRkMTNmN2E4ZmQ2MjQ2MjJjODFmNDYiLCJpYXQiOjE2ODI3NzgzNjIsImV4cCI6MTY4Mjc4MTk2Mn0.ir6snugfDNo6bZ8UolSNlHO31EVKcG1Rly5b653yrN_jc5QPeWQM_5UNwVcGo7WFRrsxhO2WHtIFi-i1qQnR2Q",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8000/logout",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8000",
+											"path": [
+												"logout"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Refresh Token",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDUwMjEyYTMxZTcxNjJhOTA4MDMzOTQiLCJpYXQiOjE2ODI5NzI5OTMsImV4cCI6MTY4Mjk3NjU5M30.0F5vzXGp9j7jNqIfeKJzv68BrUuN-LNdJ7BW-0qqIB2pBrh11nc3MKpFG5ZUri-BDaymdonDTARHjjCqMdWMaQ",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "http://localhost:8000/refresh_token",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8000",
+											"path": [
+												"refresh_token"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Upload",
+							"item": [
+								{
+									"name": "Upload CV",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDVmNGNlMmM1ZTg0YzFkMThhZWNhNTIiLCJpYXQiOjE2ODM5Njg3NjUsImV4cCI6MTY4Mzk3MjM2NX0.eyQzLCcuLxWLuiImJPuLn4T44fWjqLpgvrRDZG5YEoNxtWaiLjPBDYMvqzwFvL_vQTqdaA4SLuCf2ErpP0uFjA",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/D:/things/UTM/CV - Nichita Sorochin.pdf"
+												},
+												{
+													"key": "candidate_name",
+													"value": "Nick Magpie",
+													"type": "text"
+												},
+												{
+													"key": "user_id",
+													"value": "645f4ce2c5e84c1d18aeca52",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "http://localhost:8000/upload_cv",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8000",
+											"path": [
+												"upload_cv"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload Job",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDVmNGNlMmM1ZTg0YzFkMThhZWNhNTIiLCJpYXQiOjE2ODM5Njg3NjUsImV4cCI6MTY4Mzk3MjM2NX0.eyQzLCcuLxWLuiImJPuLn4T44fWjqLpgvrRDZG5YEoNxtWaiLjPBDYMvqzwFvL_vQTqdaA4SLuCf2ErpP0uFjA",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"user_id\": \"645f4ce2c5e84c1d18aeca52\",\r\n    \"title\": \"WhatTheTitle\",\r\n    \"description\": \"TestDescription\",\r\n    \"location\": \"TestLocation\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "http://localhost:8000/upload_job",
+											"protocol": "http",
+											"host": [
+												"localhost"
+											],
+											"port": "8000",
+											"path": [
+												"upload_job"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Search",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDVmNGNlMmM1ZTg0YzFkMThhZWNhNTIiLCJpYXQiOjE2ODM5OTE5ODIsImV4cCI6MTY4Mzk5NTU4Mn0.AFK6uJYR50Py3fQ392PXAUaht7AfZxTfBIAPiGbwlxfELGLev0WB7im2SUTufqFlniQ_vJoG1KGDwYlAfDO_lA",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://localhost:8000/search/cvs/?q=sudent&offset=0",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"search",
+										"cvs",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "sudent"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "q",
+											"value": "akka",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete CV",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDUwMjEyYTMxZTcxNjJhOTA4MDMzOTQiLCJpYXQiOjE2ODI5NzMwMTQsImV4cCI6MTY4Mjk3NjYxNH0.qDi9NU7CwphpyzS1eobTvR0YTGsqB9nVoBjOV0QxzUb22xJ16It4PriKG3R5Zd4RBzSfrZv03up4e4D50At12Q",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8000/delete_cv/6450218a7cb0319c56b583fd",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"delete_cv",
+										"6450218a7cb0319c56b583fd"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Job",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDUwMjEyYTMxZTcxNjJhOTA4MDMzOTQiLCJpYXQiOjE2ODI5NzMwMTQsImV4cCI6MTY4Mjk3NjYxNH0.qDi9NU7CwphpyzS1eobTvR0YTGsqB9nVoBjOV0QxzUb22xJ16It4PriKG3R5Zd4RBzSfrZv03up4e4D50At12Q",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8000/delete_job/6450219f56dea40c4a12ca13",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"delete_job",
+										"6450219f56dea40c4a12ca13"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Download CV",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDUwMjQ3N2JlYWJlMDdjMjYzZjM0ODEiLCJpYXQiOjE2ODI5Nzc3NzcsImV4cCI6MTY4Mjk4MTM3N30.bhhJ2yRqb5hfuXSfxKKkg1CzPh15r8l_rFMQGngm-d6NFkKxlfrW19-2RK8wc3pPs9iddfPSBH8_d-CJ_jvgQQ",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8000/cv/download/6450340059c9da4759244dec",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"cv",
+										"download",
+										"6450340059c9da4759244dec"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "pythoh",
+											"disabled": true
+										},
+										{
+											"key": "q",
+											"value": "djang,",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get recommendation",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDVlNjZhNGEzZTE4OTJkODQ4ZmUyOGEiLCJpYXQiOjE2ODM5MDgyNjYsImV4cCI6MTY4MzkxMTg2Nn0.r1nvCA5xxKC6sE1A5M7IsdoYORBZn1Th1C2C99vCf2xzgRWFQgAXVqIlgpJ72haGvxXfffpmQ1WlV9HhK56qig",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8000/recommendation/645e66a4a3e1892d848fe28a",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"recommendation",
+										"645e66a4a3e1892d848fe28a"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "CV_Processing",
+			"item": [
+				{
+					"name": "Saga",
+					"item": [
+						{
+							"name": "CV_Processing Rollback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"644bf3455a5262843b34dc3f\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8003/cv/rollback/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8003",
+									"path": [
+										"cv",
+										"rollback",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CV_Processing Success",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"644919b665235e019a134dbf\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8003/cv/success/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8003",
+									"path": [
+										"cv",
+										"success",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "CV_Processing/cv",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/D:/things/UTM/CV - Nichita Sorochin.pdf"
+								},
+								{
+									"key": "candidate_name",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "user_id",
+									"value": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:8003/cv/",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"cv",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CV_Processing/cv delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8003/cv/delete/644171dc1f3bf947c392fc8f",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"cv",
+								"delete",
+								"644171dc1f3bf947c392fc8f"
+							],
+							"query": [
+								{
+									"key": "file_name",
+									"value": "CV_-_Nichita_Sorochin.pdf",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CV_Processing/cv/info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/D:/things/UTM/CV - Nichita Sorochin.pdf"
+								},
+								{
+									"key": "candidate_name",
+									"value": "test1234",
+									"type": "text"
+								},
+								{
+									"key": "user_id",
+									"value": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://localhost:8003/cv/info/6431a9dca075f6176a26d2f9",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"cv",
+								"info",
+								"6431a9dca075f6176a26d2f9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download CV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8003/cv/download/644d17758b1387b0bd2acbc0",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8003",
+							"path": [
+								"cv",
+								"download",
+								"644d17758b1387b0bd2acbc0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recommend",
+			"item": [
+				{
+					"name": "Saga",
+					"item": [
+						{
+							"name": "Rollback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"64454e67568cf701ef624f15\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8000/rollback/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"rollback",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Success",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"6448c514d56b166ca9590b83\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8006/success/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8006",
+									"path": [
+										"success",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User Upload",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Service-Auth",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyNjkzNDE5fQ.1QpvaF2WGvrTR4Lvaz0Bjm8iQbThaMRUD5ZGQ3ThTWU",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRhZGI3Y2E4MDhlNzc1M2RlMWFhMzgiLCJpYXQiOjE2ODI2OTIxNzUsImV4cCI6MTY4MjY5NTc3NX0.DX4LqPNzJN2fhN8ZyEE_6-YFUFR7NQhh3YEdUANklojayE3n4fccBMAelxiGIiwFfSKmQR39vrfuOPInShn78g",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"64454c9012e91c6414d0c12b\",\r\n    \"type\": \"company\",\r\n    \"location\": \"jija\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8006/upload/",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8006",
+							"path": [
+								"upload",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Tags Upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"64454c9012e91c6414d0c12b\",\r\n    \"tags\": [\r\n        \"python\",\r\n        \"djongo\",\r\n        \"scalu\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8006/tags/",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8006",
+							"path": [
+								"tags",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Searches Upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"64454c9012e91c6414d0c12b\",\r\n    \"searches\": [\r\n        \"C++\",\r\n        \"Assembler\",\r\n        \"Kek\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8006/searches/",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8006",
+							"path": [
+								"searches",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recoomendations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8006/recommendation/?_id=64454c9012e91c6414d0c12b",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8006",
+							"path": [
+								"recommendation",
+								""
+							],
+							"query": [
+								{
+									"key": "_id",
+									"value": "64454c9012e91c6414d0c12b"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Saga",
+					"item": [
+						{
+							"name": "Rollback",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Service-Auth",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyNTQwMTI0fQ.98um284jiXmi9G6NesfOmSPcRnVg-REHjWUDqSvfoQQ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"644982ff04ee3b0020dbc77e\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8002/rollback/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8002",
+									"path": [
+										"rollback",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Success",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Service-Auth",
+										"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyNjI3MzU3fQ.7e1u6gxyp5bonroIpEYg8Tu2_0WsUz9jetIyTynJk0o",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"644adb7ca808e7753de1aa39\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8002/success/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8002",
+									"path": [
+										"success",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Service-Auth",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyNjI3MzU3fQ.7e1u6gxyp5bonroIpEYg8Tu2_0WsUz9jetIyTynJk0o",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"test123\",\r\n    \"password\": \"lola444\",\r\n    \"userType\": \"company\",\r\n    \"roles\": [\"USER\"],\r\n    \"location\": \"aaabbb\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8002/auth/register",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8002",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Service-Auth",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyOTY1NDIwfQ.GXt7zIh4THVqZNevYu2JDNOAntcxMn8pBtMxiKLCb8U",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"test123\",\r\n    \"password\": \"lola444\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8002/auth/login",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8002",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0MTIzIiwiaWF0IjoxNjgxMzY1NzQ5LCJleHAiOjE2ODEzNjkzNDl9.djsEn61-UaTWlXFT5oWnayuRa7e4huT4R-N1jdepZFbj_6-_j5oQGk1Gup-ZfhJ6J0L57FOfMTdDNWFEljc2Iw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8002/logout",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8002",
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh_Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDQ5ODM0MTA0ZWUzYjAwMjBkYmM3N2YiLCJpYXQiOjE2ODI1Mzk5OTYsImV4cCI6MTY4MjU0MzU5Nn0.dtWsO8lD5_NdmrYNV-0lELrme0nwIuXzqJ-NbXwTBDjRhUZPdAPdFDRaXj7VCigiTyLn0pOnSWqYswNg1a1Efw",
+								"type": "text"
+							},
+							{
+								"key": "Service-Auth",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyNTQwMTI0fQ.98um284jiXmi9G6NesfOmSPcRnVg-REHjWUDqSvfoQQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8002/refresh_token",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8002",
+							"path": [
+								"refresh_token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRhZGI3Y2E4MDhlNzc1M2RlMWFhMzgiLCJpYXQiOjE2ODI2OTIwMjYsImV4cCI6MTY4MjY5NTYyNn0.ogHV1EuqU5bBW7GERd8nCSSpPa3fEnRJQhvY6irooOxUFOCbr58KbHHm1-PTP53WbCMpT7GwleFusnpjWroonQ",
+								"type": "text"
+							},
+							{
+								"key": "Service-Auth",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKSUpBIiwiZXhwIjoxNjgyNjkzMDE5fQ.CiHoyho_wOypDhdbu1H52TNr-o2FxBo9oIJ1Q7Fd9hQ",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "https://localhost:8002/user/644adb7ca808e7753de1aa38",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8002",
+							"path": [
+								"user",
+								"644adb7ca808e7753de1aa38"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orchestrator",
+			"item": [
+				{
+					"name": "Routes",
+					"item": [
+						{
+							"name": "Authentication",
+							"item": [
+								{
+									"name": "Register",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "X-CSRF-TOKEN",
+												"value": "f",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"test123\",\r\n    \"password\": \"lola444\",\r\n    \"userType\": \"company\",\r\n    \"roles\": [\"USER\"],\r\n    \"location\": \"aaabbb\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8001/register",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8001",
+											"path": [
+												"register"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Login",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Service-Auth",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRiZjhlODFlYjFiZDMwY2Y0ODE2MjkiLCJpYXQiOjE2ODI3MDA1MjAsImV4cCI6MTY4MjcwNDEyMH0.utAciArGY8-BmhVqLx29gF3T7bQWsenY-atKw1gS7IKCfvAcSyfc-y2hxqSHTLgrg8MYKevFt2CgeI4bkHBJ4w",
+												"type": "text",
+												"disabled": true
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"username\": \"test123\",\r\n    \"password\": \"lola444\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8001/login",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8001",
+											"path": [
+												"login"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Logout (Deprecated)",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRkMTNmN2E4ZmQ2MjQ2MjJjODFmNDYiLCJpYXQiOjE2ODI3NzgzNjIsImV4cCI6MTY4Mjc4MTk2Mn0.ir6snugfDNo6bZ8UolSNlHO31EVKcG1Rly5b653yrN_jc5QPeWQM_5UNwVcGo7WFRrsxhO2WHtIFi-i1qQnR2Q",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8001/user_logout",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8001",
+											"path": [
+												"user_logout"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Refresh Token",
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRkMTNmN2E4ZmQ2MjQ2MjJjODFmNDYiLCJpYXQiOjE2ODI5NjQ1MjYsImV4cCI6MTY4Mjk2ODEyNn0.sUvFGypf2BSG-C9sEZTwm6GYQ4xrFNp6J2iLGVTJE7a_CzXnLH_HfGvrofVXMPINAcLOXwMUreKvzETTLqzCdw",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "https://localhost:8001/refresh_token",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8001",
+											"path": [
+												"refresh_token"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Upload",
+							"item": [
+								{
+									"name": "Upload CV",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRkNzliZjY3NzkwZjEzNGY5MDA5NzciLCJpYXQiOjE2ODI3OTkwMzksImV4cCI6MTY4MjgwMjYzOX0.4sYaaooyXfsHaYtYQhdnqEB0rul8e_ZhIcwRXO-fnfBL5Z-vIs4D9cQZhe_Lw_rI8UfKYCe77xhFqY1ZBR-x_g",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/C:/Users/Magpie/Desktop/CV - Nichita Sorochin.pdf"
+												},
+												{
+													"key": "candidate_name",
+													"value": "Nick Magpie",
+													"type": "text"
+												},
+												{
+													"key": "user_id",
+													"value": "644d79bf67790f134f900977",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "https://localhost:8001/upload_cv",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8001",
+											"path": [
+												"upload_cv"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload Job",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Authorization",
+												"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRjMGZmZjFlYjFiZDMwY2Y0ODE2MmIiLCJpYXQiOjE2ODI3MDY0MzEsImV4cCI6MTY4MjcxMDAzMX0.jNbk-Hv4285QKzakxGOeEV80kZU1QqHsmqrAEbtAOeW-yf0U6MzXWQ8CaTnORlR0pgfFfmtOPiHjZ-d16DBUPA",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"user_id\": \"644c19991eb1bd30cf48162d\",\r\n    \"title\": \"WhatTheTitle\",\r\n    \"description\": \"TestDescription\",\r\n    \"location\": \"TestLocation\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8001/upload_job",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8001",
+											"path": [
+												"upload_job"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Search",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRkNzliZjY3NzkwZjEzNGY5MDA5NzciLCJpYXQiOjE2ODI3OTkwMzksImV4cCI6MTY4MjgwMjYzOX0.4sYaaooyXfsHaYtYQhdnqEB0rul8e_ZhIcwRXO-fnfBL5Z-vIs4D9cQZhe_Lw_rI8UfKYCe77xhFqY1ZBR-x_g",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8001/search/cv/?q=pythoh&q=djang,&offset=0",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"search",
+										"cv",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "pythoh"
+										},
+										{
+											"key": "q",
+											"value": "djang,"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRkMTNmN2E4ZmQ2MjQ2MjJjODFmNDYiLCJpYXQiOjE2ODI3NzYzMDMsImV4cCI6MTY4Mjc3OTkwM30.rlLgm-OOmIaPFAEXfARehANa914MyYSwvRUvz4RxuqC_FFc2J57HuILmN-UDXbbbibV7L9cSgq5J7H1YGLbovQ",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8001/delete_cv/644d20be0e453a31231b0aaf",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"delete_cv",
+										"644d20be0e453a31231b0aaf"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Download CV",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2NDRjMTk5OTFlYjFiZDMwY2Y0ODE2MmQiLCJpYXQiOjE2ODI3MDg4OTcsImV4cCI6MTY4MjcxMjQ5N30.RuWa6ddr8gBqQsjhqx3gUkYt1IYW5eQDwC2HlOD2YuWYq_Gv6mesYbzu2Iao6XHfPA3suCgW72Qqta3boPCarA",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8001/cv/download/644d20be0e453a31231b0aaf",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8001",
+									"path": [
+										"cv",
+										"download",
+										"644d20be0e453a31231b0aaf"
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "pythoh",
+											"disabled": true
+										},
+										{
+											"key": "q",
+											"value": "djang,",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "0",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Register Service",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"serviceName\": \"authentication\",\r\n    \"sharedSecretKey\": \"TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8001/auth/register",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Service-Auth",
+								"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdXRoZW50aWNhdGlvbiIsImp0aSI6IjMxOGEyOTQ0LWJlZTEtNDM3NC05NjEwLTQ0NjIzZGU0NjEwOCIsImV4cCI6MTY4MjMyOTQ3OX0.ZqvuzWp8F2k6xxxnK7jqvIJbD19cFQnFAJo8ai7wV8o",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"serviceName\": \"authentication\",\r\n    \"serviceUUID\": \"318a2944-bee1-4374-9610-44623de46108\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8001/auth/refresh",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8001",
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Job Posting",
+			"item": [
+				{
+					"name": "Saga",
+					"item": [
+						{
+							"name": "Success",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"6449164e71fb37931cde9602\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8004/success/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8004",
+									"path": [
+										"success",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Rollback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"64491f54d00a8f75bbe14c13\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8004/rollback/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8004",
+									"path": [
+										"rollback",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Job Posting/jobs",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": \"jija228\",\r\n    \"title\": \"WhatTheTitle\",\r\n    \"description\": \"TestDescription\",\r\n    \"location\": \"TestLocation\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8004/jobs/",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8004",
+							"path": [
+								"jobs",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Job Posting/jobs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8000/jobs/644197d9dcc91872216ab831",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"jobs",
+								"644197d9dcc91872216ab831"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Job Posting/jobs",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"WhatTheTitle1\",\r\n    \"description\": \"TestDescription1\",\r\n    \"location\": \"TestLocation1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://localhost:8000/jobs/644197d9dcc91872216ab831",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"jobs",
+								"644197d9dcc91872216ab831"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Job Posting/jobs",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "https://localhost:8000/jobs/644197d9dcc91872216ab831",
+							"protocol": "https",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"jobs",
+								"644197d9dcc91872216ab831"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Search",
+			"item": [
+				{
+					"name": "CV",
+					"item": [
+						{
+							"name": "Saga",
+							"item": [
+								{
+									"name": "Success",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"644900bafd6ee6355abd00a3\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8005/success/",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8005",
+											"path": [
+												"success",
+												""
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Rollback",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"643ab84944009de54ef0887a\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://localhost:8005/rollback/",
+											"protocol": "https",
+											"host": [
+												"localhost"
+											],
+											"port": "8005",
+											"path": [
+												"rollback",
+												""
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Save CV Metadata",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"_id\": \"643ab84944009de54ef0887a\",\r\n    \"filename\": \"my_cv.pdf\",\r\n    \"filetype\": \"pdf\",\r\n    \"candidate_name\": \"John Doe1\",\r\n    \"user_id\": \"f439fj084u90f85uf\",\r\n    \"tags\": [\"python\", \"django\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8005/cv/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8005",
+									"path": [
+										"cv",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete CV Metadata",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"postman.setGlobalVariable('Xtoken', postman.getResponseCookie(\"XSRF-TOKEN\").value);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "X-XSRF-TOKEN",
+										"value": "{{xsrf-token}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8005/cv/?_id=6448fb9ea25ba6d5522aca4b",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8005",
+									"path": [
+										"cv",
+										""
+									],
+									"query": [
+										{
+											"key": "_id",
+											"value": "6448fb9ea25ba6d5522aca4b"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CV Search",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8005/search/cv/?q=pythoh&q=djang,&offset=0",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8005",
+									"path": [
+										"search",
+										"cv",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "pythoh"
+										},
+										{
+											"key": "q",
+											"value": "djang,"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Job",
+					"item": [
+						{
+							"name": "Save Job",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"_id\": \"643ab84944009de54ef0887a\",\r\n    \"user_id\": \"jija228\",\r\n    \"title\": \"WhatTheTitle\",\r\n    \"description\": \"TestDescription\",\r\n    \"location\": \"TestLocation\",\r\n    \"tags\": [ \"djongo\", \"scala\" ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8000/job/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"job",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Job",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"postman.setGlobalVariable('Xtoken', postman.getResponseCookie(\"XSRF-TOKEN\").value);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "X-XSRF-TOKEN",
+										"value": "{{xsrf-token}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"url": {
+									"raw": "https://localhost:8000/job/?_id=643ab84944009de54ef0887a",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"job",
+										""
+									],
+									"query": [
+										{
+											"key": "_id",
+											"value": "643ab84944009de54ef0887a"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Job Search",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://localhost:8000/search/job/?q=scla&q=djong&offset=0",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"search",
+										"job",
+										""
+									],
+									"query": [
+										{
+											"key": "q",
+											"value": "scla"
+										},
+										{
+											"key": "q",
+											"value": "djong"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Saga",
+					"item": [
+						{
+							"name": "Success",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"6446ae66d63f22bd9776e9d9\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8005/success/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8005",
+									"path": [
+										"success",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Rollback",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"id\": \"643ab84944009de54ef0887a\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://localhost:8000/rollback/",
+									"protocol": "https",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"rollback",
+										""
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "EurekaJWT",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"secretKey\": \"TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234TestStringSecretKey1234\",\r\n    \"serviceName\": \"JIJA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8761/refresh_token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8761",
+					"path": [
+						"refresh_token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Elastic Delete Indexes",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://elastic:C9xWgTkX-GTpWcY8Gnsg@localhost:9200/jobs/",
+					"protocol": "https",
+					"auth": {
+						"user": "elastic",
+						"password": "C9xWgTkX-GTpWcY8Gnsg"
+					},
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"jobs",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
